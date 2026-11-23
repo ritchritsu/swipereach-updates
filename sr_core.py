@@ -18,8 +18,9 @@ _LS = None
 def ls():
     global _LS
     if _LS is None:
-        p = os.environ.get('SR_LEADSCRAPER') or os.path.join(os.path.dirname(HERE), 'LeadScraper', 'LeadScraper.py')
-        if not os.path.exists(p) and os.path.exists(os.path.join(HERE, 'LeadScraper', 'LeadScraper.py')): p = os.path.join(HERE, 'LeadScraper', 'LeadScraper.py')   # the installed .exe keeps it inside
+        cands = [os.environ.get('SR_LEADSCRAPER') or '', os.path.join(HERE, 'LeadScraper', 'LeadScraper.py'), os.path.join(os.path.dirname(HERE), 'LeadScraper', 'LeadScraper.py'),
+                 os.path.join(os.path.dirname(os.path.abspath(sys.argv[0] or '.')), 'LeadScraper', 'LeadScraper.py'), os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0] or '.'))), 'LeadScraper', 'LeadScraper.py')]
+        p = next((c for c in cands if c and os.path.exists(c)), cands[2])   # works from the source folder, the installed .exe and a downloaded update
         if 'LeadScraper' in sys.modules and hasattr(sys.modules['LeadScraper'], '_key_has_headroom'):
             _LS = sys.modules['LeadScraper']
         else:
