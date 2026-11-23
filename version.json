@@ -1,0 +1,14 @@
+{
+ "v": 5,
+ "files": [
+  "sr_app.py",
+  "sr_boost.py",
+  "sr_brain.py",
+  "sr_compose.py",
+  "sr_core.py",
+  "sr_niches.py",
+  "sr_sheet.py",
+  "ui.html"
+ ],
+ "notes": ""
+}

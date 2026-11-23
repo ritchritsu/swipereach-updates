@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SwipeReach Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#0b0c0f;--bg2:#101217;--panel:#14161c;--panel2:#191c23;--line:#23262f;--line2:#2c303b;
+ --t:#ecedf1;--t2:#a4a9b6;--t3:#6c7280;--acc:#7c6cff;--acc2:#9a8dff;--accbg:rgba(124,108,255,.12);
+ --ok:#34c77b;--okbg:rgba(52,199,123,.12);--warn:#f0b544;--warnbg:rgba(240,181,68,.12);--bad:#ef5d5d;--badbg:rgba(239,93,93,.12);
+ --r:12px;--r2:8px;--sh:0 1px 0 rgba(255,255,255,.03) inset,0 8px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--t);font:14px/1.5 Inter,"Segoe UI Variable","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,textarea,select{font:inherit;color:inherit}
+::selection{background:var(--accbg)}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#262a33;border-radius:10px;border:3px solid transparent;background-clip:padding-box}
+.app{display:grid;grid-template-columns:232px 1fr;height:100vh}
+/* sidebar */
+aside{background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:18px 12px}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#8b7bff,#5a46f0);display:grid;place-items:center;box-shadow:0 4px 14px rgba(124,108,255,.35)}
+.brand b{font-weight:650;letter-spacing:-.01em}.brand small{display:block;color:var(--t3);font-size:11.5px;margin-top:-2px}
+nav{display:flex;flex-direction:column;gap:2px}
+.nv{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--r2);color:var(--t2);cursor:pointer;border:0;background:none;text-align:left;width:100%;transition:background .12s,color .12s}
+.nv:hover{background:var(--panel);color:var(--t)}.nv.on{background:var(--panel2);color:var(--t);box-shadow:inset 0 0 0 1px var(--line)}
+.nv svg{width:17px;height:17px;flex:none;opacity:.9}.nv .bd{margin-left:auto;font-size:11.5px;background:var(--panel2);border:1px solid var(--line2);padding:0 7px;border-radius:20px;color:var(--t2)}
+.nv .bd.hot{background:var(--acc);border-color:var(--acc);color:#fff}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:12px;padding:10px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);font-weight:600}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px}
+.seg button{flex:1;white-space:nowrap;border:0;background:none;padding:5px 6px;border-radius:6px;color:var(--t2);cursor:pointer;font-size:12.5px;font-weight:500}
+.seg button.on{background:var(--panel2);color:var(--t);box-shadow:0 1px 2px rgba(0,0,0,.4),inset 0 0 0 1px var(--line2)}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--t2)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex:none}.dot.ok{background:var(--ok);box-shadow:0 0 0 3px var(--okbg)}.dot.warn{background:var(--warn);box-shadow:0 0 0 3px var(--warnbg)}
+/* main */
+main{overflow:auto;position:relative}
+.page{display:none;max-width:1120px;margin:0 auto;padding:34px 40px 120px}.page.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+h1{font-size:24px;font-weight:650;letter-spacing:-.02em}.sub{color:var(--t2);margin-top:4px}
+.head{display:flex;align-items:flex-end;gap:16px;margin-bottom:26px}.head .grow{flex:1}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+.card+.card{margin-top:14px}
+.step{display:flex;align-items:center;gap:10px;margin-bottom:14px}.step .n{width:22px;height:22px;border-radius:50%;background:var(--accbg);color:var(--acc2);font-size:12px;font-weight:700;display:grid;place-items:center}
+.step b{font-weight:600}.step .r{margin-left:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line2);background:var(--panel2);color:var(--t);padding:8px 14px;border-radius:9px;cursor:pointer;font-weight:550;font-size:13.5px;transition:all .12s;white-space:nowrap}
+.btn:hover{border-color:#3a3f4c;background:#1e2129}.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--acc);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(124,108,255,.3)}.btn.pri:hover{background:#8a7bff}
+.btn.ghost{background:none;border-color:transparent;color:var(--t2)}.btn.ghost:hover{background:var(--panel2);color:var(--t)}
+.btn.danger:hover{color:var(--bad);border-color:rgba(239,93,93,.4)}
+.btn.lg{padding:12px 22px;font-size:14.5px;border-radius:11px}.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:7px}
+.btn:disabled{opacity:.45;pointer-events:none}
+.btn svg{width:15px;height:15px}
+input.in,textarea.in,select.in{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;outline:none;transition:border .12s,box-shadow .12s;width:100%}
+input.in:focus,textarea.in:focus,select.in:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--accbg)}
+textarea.in{resize:vertical;line-height:1.6}
+.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:12.5px;color:var(--t2);font-weight:500}
+.muted{color:var(--t3)}.t2{color:var(--t2)}.small{font-size:12.5px}
+/* who cards */
+.who{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wc{border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;background:var(--bg2);transition:all .14s;display:flex;gap:14px;align-items:flex-start}
+.wc:hover{border-color:var(--line2)}.wc.on{border-color:var(--acc);background:linear-gradient(180deg,rgba(124,108,255,.09),rgba(124,108,255,.02));box-shadow:0 0 0 3px var(--accbg)}
+.wc .ic{width:38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;flex:none;border:1px solid var(--line2)}
+.wc.on .ic{background:var(--acc);border-color:transparent}.wc b{display:block;font-weight:600}.wc p{color:var(--t2);font-size:13px;margin-top:2px}
+.toggle{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);cursor:pointer}
+.sw{width:36px;height:20px;border-radius:20px;background:#2a2e38;position:relative;transition:.15s;flex:none}.sw:after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s}
+.toggle.on .sw{background:var(--acc)}.toggle.on .sw:after{left:18px}
+/* niches */
+.nsearch{position:relative;margin-bottom:16px}.nsearch svg{position:absolute;left:12px;top:11px;width:16px;opacity:.5}.nsearch input{padding-left:36px}
+.grp{margin-bottom:16px}.grp-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}.grp-h .lbl{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--bg2);border-radius:20px;padding:6px 12px;cursor:pointer;color:var(--t2);font-size:13px;transition:all .12s;user-select:none;display:inline-flex;gap:6px;align-items:center}
+.chip:hover{border-color:var(--line2);color:var(--t)}.chip.on{background:var(--accbg);border-color:rgba(124,108,255,.55);color:#fff}
+.chip i{font-style:normal;font-size:11px;color:var(--t3)}.chip.on i{color:var(--acc2)}
+.linkb{background:none;border:0;color:var(--acc2);cursor:pointer;font-size:12.5px;font-weight:500;padding:0}.linkb:hover{text-decoration:underline}
+/* run bar */
+.runbar{position:sticky;bottom:0;margin:20px -40px -120px;padding:16px 40px;background:linear-gradient(180deg,rgba(11,12,15,0),var(--bg) 30%);display:flex;align-items:center;gap:18px}
+.budget{display:flex;align-items:center;gap:12px;flex:1;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:180px}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--acc) var(--p,30%),#2a2e38 var(--p,30%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;margin-top:-6px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.adv summary{cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;list-style:none;display:flex;gap:8px;align-items:center}.adv summary::-webkit-details-marker{display:none}
+.adv[open] summary svg{transform:rotate(90deg)}.adv summary svg{width:14px;transition:.15s}
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* progress */
+.prog{display:none}.prog.on{display:block}
+.pbar.indet i{width:35%!important;animation:ind 1.3s ease-in-out infinite}@keyframes ind{0%{margin-left:-35%}100%{margin-left:100%}}
+.pbar{height:6px;border-radius:6px;background:#22252e;overflow:hidden;margin:14px 0 8px}.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),#b0a6ff);transition:width .4s ease;border-radius:6px}
+.livelist{display:flex;flex-direction:column;gap:8px;margin-top:16px;max-height:380px;overflow:auto}
+.live{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);animation:fade .25s ease}
+.log{font:12px/1.6 "Cascadia Mono",Consolas,monospace;color:var(--t3);max-height:160px;overflow:auto;white-space:pre-wrap;margin-top:12px}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;flex:none}@keyframes sp{to{transform:rotate(360deg)}}
+/* leads */
+.toolbar{display:flex;gap:10px;align-items:center;margin:0 -40px 14px;padding:12px 40px;flex-wrap:wrap;position:sticky;top:0;z-index:6;background:linear-gradient(var(--bg) 85%,rgba(11,12,15,0))}
+.toolbar .nsearch{margin:0;flex:1;min-width:220px}
+.rows{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.row{display:grid;grid-template-columns:18px 40px minmax(0,1.6fr) 110px 120px 92px 26px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .1s}
+.row:last-child{border-bottom:0}.row:hover{background:var(--panel2)}.row.sel{background:var(--panel2);box-shadow:inset 3px 0 0 var(--acc)}
+.av{width:40px;height:40px;border-radius:50%;background:#262a33 center/cover;flex:none;display:grid;place-items:center;font-weight:600;color:var(--t2)}
+.nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{color:var(--t3);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num b{display:block;font-weight:600;font-size:13.5px}.num span{font-size:11.5px;color:var(--t3)}
+.score{display:flex;align-items:center;gap:8px}.ring{--v:50;width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--c,var(--ok)) calc(var(--v)*1%),#262a33 0);display:grid;place-items:center;font-size:11.5px;font-weight:700}
+.ring:before{content:"";position:absolute}.ring span{width:26px;height:26px;border-radius:50%;background:var(--panel);display:grid;place-items:center}
+.row:hover .ring span,.row.sel .ring span{background:var(--panel2)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tag.ok{background:var(--okbg);color:var(--ok)}.tag.warn{background:var(--warnbg);color:var(--warn)}.tag.acc{background:var(--accbg);color:var(--acc2)}.tag.bad{background:var(--badbg);color:var(--bad)}.tag.n{background:#20232b;color:var(--t2)}
+.mail{width:26px;height:26px;border-radius:7px;display:grid;place-items:center}.mail svg{width:15px}.mail.y{color:var(--ok)}.mail.n{color:var(--t3);opacity:.6}
+.empty{padding:60px 20px;text-align:center;color:var(--t3)}.empty b{display:block;color:var(--t);font-size:15px;margin-bottom:4px}
+/* drawer */
+.scrim{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)}.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:31;width:min(620px,92vw);background:var(--bg2);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .24s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.5)}
+.drawer.on{transform:none}
+.dh{display:flex;gap:14px;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}.dh .av{width:52px;height:52px}
+.dh h2{font-size:18px;font-weight:650;letter-spacing:-.01em}.db{overflow:auto;padding:20px 24px 30px;flex:1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}.stat span{font-size:11.5px;color:var(--t3)}.stat b{display:block;font-size:16px;font-weight:650;margin-top:1px}
+.sec-t{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);font-weight:650;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+.sec-t:after{content:"";flex:1;height:1px;background:var(--line)}
+.why{display:flex;flex-direction:column;gap:6px}.why div{display:flex;gap:9px;align-items:flex-start;color:var(--t2);font-size:13.5px}.why svg{width:15px;color:var(--ok);flex:none;margin-top:3px}
+.vid{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);cursor:pointer}.vid:hover{border-color:var(--line2)}
+.vid img{width:120px;height:68px;border-radius:7px;object-fit:cover;background:#222;flex:none}
+.hint{display:flex;gap:10px;padding:10px 12px;border-radius:10px;background:var(--warnbg);color:#f3cf86;font-size:12.5px;margin-top:8px}
+.checks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.selfie{width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--line);display:none;cursor:pointer}
+.sug{font-style:normal;margin-left:8px;display:inline-flex;gap:5px;vertical-align:middle}.sug b{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--t3);cursor:pointer;display:inline-block}.sug b.on{background:var(--t);border-color:var(--t)}
+.sfx{position:fixed;inset:0;z-index:45;display:none;background:rgba(0,0,0,.6);backdrop-filter:blur(3px)}.sfx.on{display:grid;place-items:center}
+.sfx-box{width:min(1240px,96vw);height:min(820px,94vh);background:var(--bg2);border:1px solid var(--line2);border-radius:14px;display:grid;grid-template-columns:1fr 300px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.sfx-stage{position:relative;background:#050608;display:grid;place-items:center;overflow:hidden}.sfx-stage canvas{max-width:100%;max-height:100%;display:block}
+.hdl{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;border:3px solid var(--acc);cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.6);z-index:2}.hdl:active{cursor:grabbing}
+.sfx-side{padding:18px;overflow:auto;display:flex;flex-direction:column;gap:14px;border-left:1px solid var(--line)}
+.srcs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.srcs .st{position:relative;border-radius:8px;overflow:hidden;border:2px solid transparent;cursor:pointer;aspect-ratio:16/9;background:#222 center/cover}.srcs .st.on{border-color:var(--acc)}.srcs .st span{position:absolute;left:6px;bottom:4px;font-size:11px;font-weight:700;background:rgba(0,0,0,.65);padding:1px 6px;border-radius:5px}
+.sl{display:flex;flex-direction:column;gap:4px}.sl label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--t2)}.sl input{width:100%}
+.dfoot{padding:14px 24px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;background:var(--bg2)}
+.kbd{font:11px Consolas,monospace;border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--t2)}
+/* followups */
+.fu{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line)}.fu:last-child{border:0}
+.dots{display:flex;gap:4px}.dots i{width:8px;height:8px;border-radius:50%;background:#2a2e38}.dots i.on{background:var(--acc)}
+/* setup */
+.setup{display:flex;flex-direction:column;gap:12px}.setup .card{margin:0}
+.sc{display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center}
+.sc .st{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line2);background:var(--panel2);color:var(--t3);font-weight:700}
+.sc .st.ok{background:var(--okbg);border-color:transparent;color:var(--ok)}
+.sc .st svg{width:16px}
+.mon{position:relative;display:inline-block;margin-top:14px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}.mon img{display:block;max-width:100%;max-height:440px;cursor:crosshair}.mon svg{position:absolute;inset:0;pointer-events:none}
+ol.steps{padding-left:18px;color:var(--t2);font-size:13px;display:flex;flex-direction:column;gap:4px;margin-top:8px}
+/* jobs */
+.jobs{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.verdict{font-size:20px;font-weight:700;letter-spacing:-.01em}
+/* pipeline */
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:6px}
+.fs{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative}
+.fs span{font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}.fs b{display:block;font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.fs i{font-style:normal;font-size:12px;color:var(--t2)}.fs .cv{position:absolute;right:12px;top:12px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accbg);color:var(--acc2)}
+.fs.a{box-shadow:inset 0 3px 0 #e2913b}.fs.b{box-shadow:inset 0 3px 0 #4f8cff}.fs.c{box-shadow:inset 0 3px 0 #d36ad6}.fs.d{box-shadow:inset 0 3px 0 var(--ok)}
+.pt{display:grid;grid-template-columns:1.3fr repeat(8,1fr);gap:8px;padding:11px 16px;border-bottom:1px solid var(--line);align-items:center;font-size:13.5px}
+.pt:last-child{border:0}.pt.h{font-size:11.5px;color:var(--t3);font-weight:650;text-transform:uppercase;letter-spacing:.04em;background:var(--bg2)}.pt.tot{font-weight:700;background:var(--panel2)}
+.pct{display:flex;flex-direction:column;gap:3px}.pct em{font-style:normal}.pct .bar{height:4px;border-radius:4px;background:#262a33;overflow:hidden}.pct .bar i{display:block;height:100%;background:var(--c,var(--acc))}
+.modal{position:fixed;inset:0;display:none;place-items:center;z-index:40}.modal.on{display:grid}.modal .card{width:min(520px,92vw)}
+/* toast */
+.toasts{position:fixed;top:18px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:50;align-items:center}
+.toast{background:#1f2229;border:1px solid var(--line2);padding:10px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:13.5px;display:flex;gap:10px;align-items:center;animation:fade .2s}
+.toast.err{border-color:rgba(239,93,93,.45)}.toast.okk{border-color:rgba(52,199,123,.45)}
+@media (max-width:1000px){.row{grid-template-columns:18px 40px 1fr 92px 26px}.row .hide-s{display:none}.who,.jobs{grid-template-columns:1fr}}
+.srcs .st.ld{background:linear-gradient(90deg,var(--panel2),var(--line),var(--panel2));background-size:200% 100%;animation:ldg 1.2s linear infinite}@keyframes ldg{to{background-position:-200% 0}}.srcs .st.bad{opacity:.35}
+.hdl.sel{box-shadow:0 0 0 3px rgba(124,92,255,.6)}
+.row .pick{opacity:.3;width:15px;height:15px;cursor:pointer;accent-color:var(--acc);margin:0}.row:hover .pick,#rows.picking .pick,.row .pick:checked{opacity:1}
+.fut{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel);font-size:13px}
+.fut th{text-align:left;font-weight:600;color:var(--t2);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.fut td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}.fut tr:last-child td{border-bottom:0}
+.fut tr.r-now td{background:rgba(229,72,77,.13)}.fut tr.r-soon td{background:rgba(245,166,35,.10)}.fut tr.r-rep td{background:rgba(48,164,108,.13)}.fut tr.r-done td{opacity:.55}
+.fc{display:inline-block;padding:2px 7px;border-radius:6px;font-size:12px;white-space:nowrap}.fc.ok{background:rgba(48,164,108,.18);color:#5fd39a}.fc.now{background:rgba(229,72,77,.22);color:#ff8b8f;font-weight:600}
+.fc.soon{background:rgba(245,166,35,.18);color:#f7c46c}.fc.wait{color:var(--t3)}.todo{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.todo div{flex:1;min-width:180px;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.todo b{font-size:20px;display:block}.todo .hot{border-color:rgba(229,72,77,.5);background:rgba(229,72,77,.08)}
+</style></head>
+<body>
+<div class="app">
+<aside>
+ <div class="brand"><div class="logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 12h11M11 6l6 6-6 6"/></svg></div><div><b>SwipeReach</b><small>Studio</small></div></div>
+ <nav id="nav">
+  <button class="nv on" data-p="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Find clients</button>
+  <button class="nv" data-p="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 20v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1"/><circle cx="9" cy="7" r="4"/><path d="M22 20v-1a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>Leads<span class="bd" id="bdLeads">0</span></button>
+  <button class="nv" data-p="fu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Follow-ups<span class="bd" id="bdDue" style="display:none">0</span></button>
+  <button class="nv" data-p="pipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Pipeline</button>
+  <button class="nv" data-p="jobs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Job posts</button>
+  <button class="nv" data-p="setup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Setup<span class="bd hot" id="bdSetup" style="display:none">!</span></button>
+ </nav>
+ <div class="side-foot">
+  <div><div class="lbl" style="margin-bottom:2px">How busy are you?</div><div class="small t3" style="margin-bottom:7px;font-size:11px">Changes how your emails close</div>
+   <div class="seg" id="cap"><button data-v="OPEN">Open</button><button data-v="PARTIAL">Partial</button><button data-v="BOOKED">Booked</button></div></div>
+  <div class="pill" id="goalPill" style="cursor:pointer" title="First messages sent today. Click to change your daily goal."><span class="dot"></span><span>Sent today…</span></div>
+  <div class="pill" id="wPill" style="display:none" title="Warm-up for your new sending account: cold emails allowed today"><span class="dot"></span><span></span></div><div class="pill" id="qPill" title="YouTube quota used today on your active key (resets daily, Pacific time)"><span class="dot"></span><span>YouTube quota…</span></div><div class="pill" id="aiPill"><span class="dot"></span><span>Checking AI…</span></div>
+ </div>
+</aside>
+
+<main id="main">
+<!-- FIND -->
+<section class="page on" id="p-find">
+ <div class="head"><div class="grow"><h1>Find clients</h1><div class="sub">Channels that need an editor and can actually pay for one. Every lead is scored on both.</div></div></div>
+ <div id="findForm">
+ <div class="card">
+  <div class="step"><span class="n">1</span><b>Who are you looking for?</b><span class="r small t2">Pick one or both</span></div>
+  <div class="who">
+   <div class="wc on" data-m="business"><div class="ic"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></div><div><b>Business owners</b><p>Coaches, teachers and pros who sell lessons, courses or services. They earn from their videos, so they can pay.</p></div></div>
+   <div class="wc" data-m="creators"><div class="ic"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="m17 10 5-3v10l-5-3"/></svg></div><div><b>Creators</b><p>Documentary, essays, gaming, commentary, vlogs and podcasts with real long-form uploads.</p></div></div>
+  </div>
+  <div class="toggle" id="grow"><span class="sw"></span><div><b style="font-weight:600">Only channels the algorithm is pushing right now</b><div class="small t2">Keeps channels whose newest videos are beating their usual views (1.6x+). Fewer leads, hotter timing.</div></div></div>
+ </div>
+ <div class="card">
+  <div class="step"><span class="n">2</span><b>Pick niches</b><span class="r small t2" id="selInfo">None picked</span></div>
+  <div class="nsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="in" id="nq" placeholder="Search niches, e.g. golf, piano, history"></div>
+  <div id="groups"></div>
+  <details class="adv" style="margin-top:6px"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>Your own searches and filters</summary>
+   <div style="margin-top:14px" class="field"><span>Your own YouTube searches (one per line, run first)</span><textarea class="in" id="custom" rows="3" placeholder="pickleball drills for seniors&#10;bonsai care tips"></textarea></div>
+   <div class="grid3" style="margin-top:12px">
+    <label class="field bz"><span>Min subscribers</span><input class="in" id="min_subs" type="number"></label>
+    <label class="field bz"><span>Max subscribers</span><input class="in" id="max_subs" type="number"></label>
+    <label class="field cr"><span>Min subscribers</span><input class="in" id="cr_min_subs" type="number"></label>
+    <label class="field cr"><span>Max subscribers</span><input class="in" id="cr_max_subs" type="number" title="Bigger channels usually already have an editor and a team"></label>
+    <label class="field cr"><span>Min views per video</span><input class="in" id="cr_min_views" type="number"></label>
+    <label class="field"><span>Google Sheet</span><select class="in" id="sheet_push"><option value="1">Add new leads to my sheet</option><option value="0">Don't add</option></select></label><label class="field"><span>Quality</span><select class="in" id="min_tier"><option value="MEDIUM">Good and great leads</option><option value="HIGH">Only great leads</option></select></label>
+   </div>
+   <label class="toggle cr" id="crMoney" style="margin-top:12px"><span class="sw"></span><div><b style="font-weight:600">Creators must have sponsors or paid products</b><div class="small t2">Sponsors, Patreon, memberships, merch, courses, or already paying an editor, so they can keep you hired. Business owners skip this, small channels are fine there.</div></div></label>
+  </details>
+ </div>
+ <div class="runbar">
+  <div class="budget"><div style="flex:1"><div style="font-weight:600"><span id="bN">12</span> searches</div><div class="small muted" id="bInfo">≈1,200 of your 10,000 daily YouTube quota · about 2 min</div><div class="small t2" id="brainInfo" style="margin-top:2px"></div></div>
+   <input type="range" id="budget" min="2" max="12" value="12"></div>
+  <label class="toggle" id="keep" style="margin:0;padding:10px 14px;flex:none" title="After your searches, keep going with next pages and new searches made from your best new leads, until you press Stop or the quota is nearly used"><span class="sw"></span><div><b style="font-weight:600">Keep going</b><div class="small t2">until I stop</div></div></label>
+  <button class="btn pri lg" id="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Find leads</button>
+ </div>
+ <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn" id="lookBtn" title="Peers of your best leads and the people who replied: their featured channels and the creators commenting on their videos. Very cheap on quota.">Find lookalikes of my best leads</button><span class="small t2">Creators who hang out with your best leads (same size, same niche). About 1 quota unit per lookup.</span></div>
+ </div>
+ <div class="prog card" id="prog">
+  <div style="display:flex;align-items:center;gap:12px"><div class="spin" id="pspin"></div><div style="flex:1"><b id="pTitle">Starting…</b><div class="small t2" id="pSub">Loading the YouTube engine</div></div><button class="btn" id="stop">Stop</button></div>
+  <div class="pbar"><i id="pb"></i></div>
+  <div class="small muted" id="pStats">0 channels looked at · 0 added to Leads</div>
+  <div class="livelist" id="live"></div>
+  <details class="adv" style="margin-top:12px"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>Details</summary><div class="log" id="log"></div></details>
+ </div>
+</section>
+
+<!-- LEADS -->
+<section class="page" id="p-leads">
+ <div class="head"><div class="grow"><h1>Leads</h1><div class="sub">Best first. Click a lead to see why it fits and write the email.</div></div><div class="small muted"><span class="kbd">J</span> <span class="kbd">K</span> to move · <span class="kbd">Enter</span> open</div></div>
+ <div class="toolbar">
+  <div class="nsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="in" id="lq" placeholder="Search name or niche"></div>
+  <div class="seg" id="lst" style="flex:none"><button data-v="today" title="Who to email today: the best leads with a working email, people who need an editor right now first">Today</button><button data-v="new" class="on" title="Not emailed yet">To email</button><button data-v="contacted" title="Emailed, waiting for a reply (follow-ups run by themselves)">Emailed</button><button data-v="replied" title="They wrote back">Replied</button><button data-v="won" title="Pitched, meetings and clients">Deals</button><button data-v="closed" title="No answer after 3 follow-ups, said no, or bounced">Ended</button><button data-v="skip">Skipped</button><button data-v="all">All</button></div>
+  <select class="in" id="lsig" style="width:auto" title="Leads who need an editor right now"><option value="">Everyone</option><option value="editor_left">Editor just left</option><option value="slowing">Uploads slowing down</option><option value="pays_editor">Already pays an editor</option><option value="growing">Growing fast</option></select><select class="in" id="lsort" style="width:auto"><option value="score">Best score</option><option value="added">Newest</option><option value="growth">Fastest growing</option><option value="subs">Most subs</option></select>
+<div id="pickBar" style="display:none;align-items:center;gap:8px"><span class="small" id="pickN"></span><button class="btn sm" id="pickAll">Select all shown</button><button class="btn sm danger" id="pickDel">Delete</button><button class="btn sm ghost" id="pickClr">Clear</button></div>
+  <button class="btn ghost" id="lsheet" style="display:none" title="Your Google Sheet syncs by itself a few seconds after any change">Sync sheet</button><button class="btn ghost" id="lfindem" title="Look for missing emails on their link-in-bio pages and websites (no YouTube quota)">Find more emails</button><button class="btn" id="lmail" title="Only leads with an email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Has email</button>
+ </div>
+ <div id="todayBar"></div>
+ <div class="rows" id="rows"></div>
+</section>
+
+<!-- FOLLOW-UPS -->
+<section class="page" id="p-fu">
+ <div class="head"><div class="grow"><h1>Follow-ups</h1><div class="sub"><b>Red = do it now.</b> The app writes every follow-up into your Gmail Drafts when it's due and notices when you've sent it. Your only job: open Drafts and press Send.</div></div><button class="btn" id="sync" title="The app already checks Gmail every minute; this just does it right now">Refresh</button><button class="btn pri" id="openDrafts" style="margin-left:8px">Open Gmail Drafts</button></div>
+ <div class="toggle" id="fuTest" style="margin:-4px 0 14px"><span class="sw"></span><div><b style="font-weight:600">Test mode: 1 day = 1 minute</b><div class="small t2">For trying it on your own email: follow-ups come due after 1, 2 and 2 <b>minutes</b> instead of days. Turn it off before real outreach.</div></div></div>
+ <div id="fuTodo"></div>
+ <div id="fuout"></div>
+ <div id="fuBoost" style="margin-top:18px"></div>
+</section>
+
+<!-- PIPELINE -->
+<section class="page" id="p-pipe">
+ <div class="head"><div class="grow"><h1>Pipeline</h1><div class="sub">Where your outreach turns into clients, by source. Find the stage that leaks.</div></div>
+  <div class="seg" id="prange" style="flex:none"><button data-v="7">7 days</button><button data-v="30">30 days</button><button data-v="90">90 days</button><button data-v="0" class="on">All time</button></div>
+  <button class="btn" id="srcBtn">Sources</button><button class="btn pri" id="addBtn">+ Add lead</button></div>
+ <div class="card" id="srcCard" style="display:none;margin-bottom:14px"><div class="step"><b>Sources you track</b><span class="r small t2">Turn on what you use, add your own</span></div>
+  <div class="chips" id="srcChips"></div><div style="display:flex;gap:8px;margin-top:12px;max-width:420px"><input class="in" id="srcNew" placeholder="e.g. Instagram, Upwork, Twitter DMs"><button class="btn" id="srcAdd">Add</button></div></div>
+ <div class="funnel" id="funnel"></div>
+ <div class="sec-t">By source</div>
+ <div class="rows" id="ptable"></div>
+ <div class="sec-t" style="margin-top:18px">Which email style gets replies</div><div class="small t2" style="margin:-4px 0 8px">Give a style about 200 sends before judging it.</div>
+ <div class="rows" id="stable"></div>
+ <div id="pBoost"></div>
+ <div class="small muted" style="margin-top:10px">Stages: <b>Outreached</b> = first message sent · <b>Engaged</b> = they replied · <b>Pitched</b> = you gave a price · <b>Closed</b> = became a client. A lead counts for the furthest stage it ever reached, even if it later went quiet or said no.</div>
+</section>
+
+<!-- JOBS -->
+<section class="page" id="p-jobs">
+ <div class="head"><div class="grow"><h1>Job posts</h1><div class="sub">Paste a YTJobs or Discord post. It checks fit, rate and age against your master doc, then writes your reply.</div></div></div>
+ <div class="card" style="margin-bottom:14px"><div class="step"><b>Hiring right now</b><span class="r"><button class="btn sm" id="radarBtn">Check for new posts</button></span></div><div class="small t2">Fresh "looking for a video editor" posts from Reddit (r/forhire, r/hiring, r/NewTubers and more). Click one to check it and write your reply. X and Discord need you logged in, so paste those yourself.</div><div id="radarOut" style="margin-top:10px"></div></div>
+ <div class="jobs">
+  <div class="card"><div class="field"><span>The whole post, including the date</span><textarea class="in" id="job" rows="16" placeholder="Paste here…"></textarea></div>
+   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn pri" id="tri">Check and write reply</button><button class="btn ghost" id="jclear">Clear</button></div></div>
+  <div id="jobout"><div class="card empty"><b>Nothing checked yet</b>Results show up here.</div></div>
+ </div>
+</section>
+
+<!-- SETUP -->
+<section class="page" id="p-setup">
+ <div class="head"><div class="grow"><h1>Setup</h1><div class="sub">One time only. Finding leads works right away; these unlock AI emails and Gmail drafts. The selfie is optional.</div></div></div>
+ <div class="setup" id="setupList"></div>
+</section>
+</main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+ <div class="dh"><div class="av" id="dAv"></div><div style="flex:1;min-width:0"><h2 id="dName"></h2><div class="small t2" id="dMeta"></div></div><select class="in" id="dStatus" style="width:auto" title="Status, synced to your Google Sheet"><option value="new">New</option><option value="drafted">Drafted</option><option value="contacted">Outreach sent</option><option value="followup">Following up</option><option value="replied">Replied</option><option value="pitched">Pitched (sent price)</option><option value="meeting">Accepted meeting</option><option value="client">Client 🎉</option><option value="no_answer">No answer</option><option value="denied">Denied</option><option value="skip">Skipped</option></select><button class="btn ghost" id="dClose" title="Close (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+ <div class="db">
+  <div class="stats" id="dStats"></div><div id="dSrcWrap" style="display:none;gap:8px;align-items:center;margin:-6px 0 6px" class="small t2">Where you found them <select class="in" id="dSrc" style="width:auto;padding:5px 10px"></select></div>
+  <div class="sec-t">Why it's a fit</div><div class="why" id="dWhy"></div>
+  <div class="sec-t">Latest video</div><div id="dVid"></div>
+  <div class="sec-t">Contact</div>
+  <div class="grid2"><label class="field"><span>Email</span><input class="in" id="dEmail" placeholder="name@example.com"></label><div class="field"><span>Their first name</span><div style="display:flex;gap:6px"><input class="in" id="dFirst" placeholder="Blank = “Hey,”"><button class="btn" id="dFindName" title="Claude reads their about, videos and email to find the owner's first name">Find</button></div></div></div><div class="small" id="dEmailChk" style="margin-top:6px"></div><div class="small muted" id="dNameSrc" style="margin-top:6px"></div><div class="small t2" id="dContacts" style="margin-top:6px"></div>
+  <div id="dHint"></div>
+  <div class="sec-t">Email</div>
+  <div style="display:flex;gap:8px;margin:0 0 12px;align-items:center;flex-wrap:wrap">
+   <select class="in" id="dStyle" style="width:auto"><option value="best">Best of both (adapts to them)</option><option value="flick">Flick style (fields + picture)</option><option value="ask">Ask first (~45 words)</option><option value="proof">With sample link (~55 words)</option></select>
+   <button class="btn pri" id="dWrite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m12 3 1.9 5.8L20 10l-5 3.6L16.5 20 12 16.4 7.5 20 9 13.6 4 10l6.1-1.2z"/></svg>Suggest with AI</button>
+   <select class="in" id="dEng" style="width:auto;display:none"><option value="auto">Best available</option><option value="claude">Claude Sonnet</option><option value="ollama">Ollama</option><option value="template">No AI</option></select><span class="small t2" id="dEngInfo"></span></div>
+  <div id="dFields">
+   <div class="grid2"><div class="field"><span>Creator name <i class="sug" id="sg-name"></i></span><input class="in fld" data-f="name" placeholder="blank = Hey,"></div>
+   <div class="field"><span>Channel niche <i class="sug" id="sg-niche"></i></span><input class="in fld" data-f="niche" placeholder="e.g. golf coaching"></div></div>
+   <div class="field" style="margin-top:10px"><span>Specific compliment <i class="sug" id="sg-compliment"></i></span><input class="in fld" data-f="compliment" placeholder="e.g. how you break a swing down into one simple fix"></div>
+   <div class="field" style="margin-top:10px"><span>Latest video <i class="sug" id="sg-video"></i></span><input class="in fld" data-f="video" placeholder="e.g. fixing a slice with one grip change"></div>
+  </div>
+  <div class="field" id="dNotesWrap" style="display:none"><span>Anything to mention? (optional)</span><input class="in" id="dNotes" placeholder="e.g. I play golf too, mention their slice video"></div>
+  <div class="field" style="margin-top:12px"><span>Subject <a href="#" class="linkb" id="dSubjNext" style="margin-left:6px">another</a></span><input class="in" id="dSubj" placeholder="Subject" style="font-weight:600"></div>
+  <div class="field" style="margin-top:10px"><span>Email <a href="#" class="linkb" id="dRebuild" style="margin-left:6px;display:none">rebuild from the fields</a></span><textarea class="in" id="dBody" rows="13" placeholder="Fill the fields above or press Suggest with AI"></textarea></div>
+  <div class="small muted" style="margin-top:4px">[IMAGE] is where the picture goes in the email.</div>
+  <div class="checks" id="dChecks"></div><div class="checks" id="dSpam"></div><div id="dExtras" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+  <div class="sec-t">Picture in the email</div>
+  <div class="seg" id="dImgMode" style="margin-bottom:8px"><button data-m="frame">Frame from their video</button><button data-m="selfie">My selfie with their video</button></div>
+  <div class="srcs" id="dFrames" style="display:none;grid-template-columns:repeat(4,1fr);margin-bottom:8px"></div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn" id="dSelfie">Edit selfie</button><label class="pill" style="cursor:pointer"><input type="checkbox" id="dAttach" checked> Put it in the email</label><span class="small t2" id="dSelfieInfo"></span></div>
+  <img class="selfie" id="dImg">
+ </div>
+ <div class="dfoot" style="flex-wrap:wrap;row-gap:8px"><button class="btn pri" id="dDraft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Open in Gmail</button><button class="btn" id="dSched" title="Makes the Gmail draft now and sends it at about 9am in their time zone (keep the app open)">Send at their 9am</button><button class="btn" id="dCopy">Copy</button><span style="flex:1"></span><button class="btn" id="dReply" style="display:none" title="Reads their reply and writes your answer into Gmail Drafts">Draft my reply</button><button class="btn" id="dKit" style="display:none" title="Downloads the best ~90 seconds of their latest video for your sample edit">Sample kit</button>
+  <button class="btn ghost" id="dSimilar" title="Find channels like this one">Find similar</button><button class="btn ghost" id="dSkip">Skip</button><button class="btn ghost danger" id="dNever" title="Delete this lead (it won't be suggested again)">Delete</button></div>
+</div>
+<div class="modal" id="addM"><div class="card"><div class="step"><b>Track a lead</b><span class="r"><button class="btn ghost sm" id="addX">Close</button></span></div>
+ <div class="grid2"><label class="field"><span>Name or channel</span><input class="in" id="mT" placeholder="e.g. Ali's gaming channel"></label><label class="field"><span>Link</span><input class="in" id="mU" placeholder="channel or job post URL"></label>
+ <label class="field"><span>Source</span><select class="in" id="mS"></select></label><label class="field"><span>Stage</span><select class="in" id="mSt"><option value="contacted">Outreached</option><option value="replied">Engaged (replied)</option><option value="pitched">Pitched (sent price)</option><option value="client">Client</option></select></label>
+ <label class="field"><span>Email (optional)</span><input class="in" id="mE"></label><label class="field"><span>Notes (optional)</span><input class="in" id="mN"></label></div>
+ <div style="display:flex;gap:8px;margin-top:14px"><button class="btn pri" id="mSave">Add to pipeline</button></div></div></div>
+<div class="sfx" id="sfx"><div class="sfx-box">
+ <div class="sfx-stage" id="sfxStage"><canvas id="sfxC"></canvas><div id="sfxBadge" style="position:absolute;left:14px;top:12px;font-size:12px;padding:4px 9px;border-radius:99px;background:rgba(0,0,0,.6);color:#fff;pointer-events:none">Quick preview</div><canvas id="sfxL" width="170" height="170" style="position:absolute;display:none;border-radius:50%;border:2px solid #fff;box-shadow:0 6px 24px rgba(0,0,0,.6);pointer-events:none;z-index:5"></canvas></div>
+ <div class="sfx-side">
+  <div><b style="font-weight:650">Selfie</b><div class="small t2">Drag the 4 dots onto the corners of your monitor's screen (a magnifier shows up while you drag; arrow keys nudge the last dot). Everything updates live.</div></div>
+  <div><div class="lbl" style="margin-bottom:8px">Image for the monitor</div><div class="srcs" id="sfxSrcs"></div><button class="btn sm" id="sfxFile" style="margin-top:8px;width:100%">Choose a file…</button></div>
+  <div><div id="sfxSl" style="display:flex;flex-direction:column;gap:10px"></div>
+   <div style="display:flex;gap:6px;margin-top:10px"><button class="btn sm ghost" id="sfxReset">Reset</button><button class="btn sm" id="sfxDefault" title="Use these corners and settings for every lead">Save as my default</button></div></div>
+  <div style="margin-top:auto;display:flex;gap:8px"><button class="btn pri" id="sfxUse" style="flex:1">Use this</button><button class="btn" id="sfxCancel">Cancel</button></div>
+ </div></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>{n=+n||0;return n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+'M':n>=1e3?(n/1e3).toFixed(n>=1e4?0:1)+'k':''+n};
+const api=()=>window.pywebview.api;
+const I={star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m12 3 1.9 5.8L20 10l-5 3.6L16.5 20 12 16.4 7.5 20 9 13.6 4 10l6.1-1.2z"/></svg>',check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>',
+ mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>'};
+function toast(m,k=''){const t=document.createElement('div');t.className='toast '+k;t.innerHTML=(k=='okk'?'<span style="color:var(--ok)">✓</span>':k=='err'?'<span style="color:var(--bad)">!</span>':'')+esc(m);$('#toasts').append(t);setTimeout(()=>t.remove(),k=='err'?6500:3200)}
+let LV=null,LC=null,LP=null;async function getLeads(){if(LP)return LP;LP=(async()=>{try{const r=await api().leads_v(LV);if(r.delta&&LC){const m=new Map(r.delta.map(x=>[x.channel_id,x]));LC.forEach(x=>{const d=m.get(x.channel_id);if(d){delete x._q;Object.assign(x,d)}});LV=r.v}else if(!r.same){LV=r.v;LC=r.leads}return LC||[]}finally{setTimeout(()=>LP=null,0)}})();return LP}
+let ST=null,SS=null,mode='business',modes=new Set(['business']),growing=false,selBy={business:new Set(),creators:new Set()},sel=new Set(),LEADS=[],view=[],cur=null,mailOnly=false;
+
+/* nav */
+function go(p){$$('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p==p));$$('.page').forEach(x=>x.classList.toggle('on',x.id=='p-'+p));$('#main').scrollTop=0;if(p=='leads')setTimeout(()=>vRender(true),0);
+ if(p=='leads')loadLeads();if(p=='fu')renderFu();if(p=='setup')renderSetup();if(p=='pipe')renderPipe()}
+$$('.nv').forEach(b=>b.onclick=()=>go(b.dataset.p));
+
+/* capacity */
+function setCap(v){$$('#cap button').forEach(b=>b.classList.toggle('on',b.dataset.v==v))}
+$$('#cap button').forEach(b=>b.onclick=()=>{setCap(b.dataset.v);api().set_capacity(b.dataset.v);toast('Capacity: '+b.textContent)});
+
+/* FIND */
+/* both cards can be on: each niche keeps its own list's rules (business = small channels fine, creators = bigger + sponsors) */
+function syncMode(){mode=modes.size>1?'both':[...modes][0];sel=new Set([...modes].flatMap(m=>[...selBy[m]]))}
+function modeUI(){syncMode();$$('.wc').forEach(x=>x.classList.toggle('on',modes.has(x.dataset.m)));$$('.bz').forEach(x=>x.style.display=modes.has('business')?'':'none');$$('.cr').forEach(x=>x.style.display=modes.has('creators')?'':'none')}
+$$('.wc').forEach(c=>c.onclick=()=>{const m=c.dataset.m;if(modes.has(m)){if(modes.size==1)return toast('Keep at least one picked');modes.delete(m)}else modes.add(m);modeUI();renderGroups();savePrefs()});
+$('#keep').onclick=()=>{$('#keep').classList.toggle('on');savePrefs()};
+$('#crMoney').onclick=()=>{$('#crMoney').classList.toggle('on');savePrefs()};
+$('#grow').onclick=()=>{growing=!growing;$('#grow').classList.toggle('on',growing)};
+$('#nq').oninput=renderGroups;$('#custom').addEventListener('input',()=>selInfo());
+function renderGroups(){syncMode();const q=$('#nq').value.trim().toLowerCase(),G={},OWN={};for(const m of modes)for(const g in ST.groups[m]){const k=modes.size>1?(m=='business'?'Business · ':'Creators · ')+g:g;G[k]=ST.groups[m][g];OWN[k]=m}let h='';
+ for(const g in G){const ns=Object.keys(G[g]).filter(n=>!q||n.includes(q)||g.toLowerCase().includes(q));if(!ns.length)continue;
+  const all=ns.every(n=>sel.has(n));
+  h+=`<div class="grp"><div class="grp-h"><span class="lbl">${esc(g)}</span><button class="linkb" data-g="${esc(g)}">${all?'Clear':'Select all'}</button></div><div class="chips">${ns.map(n=>`<span class="chip${sel.has(n)?' on':''}" data-n="${esc(n)}">${esc(n)}<i>${G[g][n]}</i></span>`).join('')}</div></div>`}
+ $('#groups').innerHTML=h||'<div class="muted small">No niche matches. Add it as your own search below.</div>';
+ const own=n=>{for(const g in G)if(n in G[g])return selBy[OWN[g]]};
+ $$('#groups .chip').forEach(c=>c.onclick=()=>{const S=own(c.dataset.n);S.has(c.dataset.n)?S.delete(c.dataset.n):S.add(c.dataset.n);renderGroups()});
+ $$('#groups .linkb').forEach(b=>b.onclick=()=>{const ns=Object.keys(G[b.dataset.g]).filter(n=>!q||n.includes(q)||b.dataset.g.toLowerCase().includes(q));const all=ns.every(n=>sel.has(n));ns.forEach(n=>all?selBy[OWN[b.dataset.g]].delete(n):selBy[OWN[b.dataset.g]].add(n));renderGroups()});
+ selInfo()}
+function renderGroupsBtns(){renderGroups()}
+function avail(){let q=0;for(const m of modes){const G=ST.groups[m];for(const g in G)for(const k in G[g])if(selBy[m].has(k))q+=G[g][k]}return q+$('#custom').value.split('\n').filter(x=>x.trim()).length}
+function selInfo(){const n=sel.size,q=avail();$('#selInfo').textContent=n?`${n} niche${n>1?'s':''} · ${q} searches available`:'None picked';
+ const r=$('#budget'),cap=Math.max(2,Math.min(10000,q||2));r.max=cap;r.value=wantAll?cap:Math.min(want,cap);budget()}
+let want=12,wantAll=false;
+function budget(){const r=$('#budget'),v=+r.value;r.style.setProperty('--p',((v-r.min)/(r.max-r.min)*100)+'%');$('#bN').textContent=(v>=+r.max&&+r.max>2?'All '+v:v);
+ const secs=Math.round(15+v*0.7),mins=Math.max(1,Math.round(secs/60)),k=qKey(),cost=v*100+v*60;$('#bInfo').textContent=k?`≈${cost.toLocaleString()} quota · ${(k.quota-k.used).toLocaleString()} left today on ${k.label} · ${secs<90?'about '+secs+' sec':'about '+mins+' min'}`:`≈${cost.toLocaleString()} YouTube quota · ${secs<90?'about '+secs+' sec':'about '+mins+' min'}`}
+$('#budget').oninput=()=>{const r=$('#budget');want=+r.value;wantAll=+r.value>=+r.max;budget()};
+$('#go').onclick=async()=>{const custom=$('#custom').value.trim();if(!sel.size&&!custom)return toast('Pick at least one niche first','err');
+ const s={keep_going:$('#keep').classList.contains('on'),max_searches:+$('#budget').value,min_tier:$('#min_tier').value,sheet_push:$('#sheet_push').value=='1',cr_need_money:$('#crMoney').classList.contains('on')};['cr_min_subs','cr_max_subs','cr_min_views'].forEach(k=>{if($('#'+k).value)s[k]=+$('#'+k).value});['min_subs','max_subs'].forEach(k=>{if($('#'+k).value)s[k]=+$('#'+k).value});
+ syncMode();const r=await api().find(mode,[...sel],custom,s,growing);if(r&&r.error)return toast(r.error,'err');
+ startProg()};
+function startProg(){found=0;checked=0;LOGB=[];$('#live').innerHTML='';$('#log').textContent='';$('#pb').style.width='0';$('#pTitle').textContent='Starting…';$('#pSub').textContent='Loading the YouTube engine';$('#pspin').style.display='';
+ $('#findForm').style.display='none';$('#prog').classList.add('on');$('#stop').textContent='Stop';$('#stop').onclick=()=>{api().stop();$('#stop').disabled=true;$('#pSub').textContent='Stopping after this channel…'}}
+let found=0,checked=0,Q=null;
+function qKey(){return Q&&Q.keys?Q.keys[Q.active]||Q.keys[0]:null}
+function renderQ(){const k=qKey();if(!k)return;const left=k.quota-k.used;
+ const _rt=Q&&Q.resets_in_min!=null?new Date((Q._at||Date.now())+Q.resets_in_min*6e4).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'';const _sc=k.search_cap&&k.searches>=k.search_cap;$('#qPill').innerHTML=_sc?`<span class="dot warn"></span><span>YouTube: searches paused · back at ${_rt||'reset'}</span>`:`<span class="dot ${left>k.quota*0.1?'ok':'warn'}"></span><span>YouTube: ${k.used.toLocaleString()} / ${fmt(k.quota)} used${_rt?' · resets '+_rt:' today'}</span>`;
+ $('#qPill').title=`${k.label}: ${k.searches.toLocaleString()} of ${k.search_cap.toLocaleString()} searches used today. Resets daily (Pacific time).`;budget()}
+async function brainUI(){try{const b=await api().search_brain();if(!b||b.error)return;const t=(b.trending||[]).slice(-3);
+ $('#brainInfo').textContent=(b.learned||b.retired)?`Smart searches: ${b.learned} learned from your best leads and what's trending${t.length?' (e.g. '+t.join(', ')+')':''} · ${b.retired} weak ones retired`:'Smart searches: gets better every run (learns from your best leads, replies and what\'s trending)'}catch(e){}}
+async function grantCheck(){try{const G=await api().quota_grant();if(!G||G.error)return;$('#qPill').title='YouTube quota grant ends '+G.end+' ('+G.days_left+' days left)';if(G.apply_now&&G.days_left>0&&!sessionStorage.getItem('gwarn')){sessionStorage.setItem('gwarn','1');toast('Your YouTube quota grant ends '+G.end+' ('+G.days_left+' days). Reapply now: Setup > YouTube has the details.','err')}}catch(e){}}
+async function loadQ(){try{const q=await api().quota();if(!q.error){q._at=Date.now();Q=q;renderQ()}}catch(e){}}
+let LOGB=[],LOGT=0;function log(t){LOGB.push(t);if(LOGB.length>300)LOGB=LOGB.slice(-300);if(!LOGT)LOGT=setTimeout(()=>{LOGT=0;const e=$('#log');e.textContent=LOGB.join('\n');e.scrollTop=1e9},250)}
+window.SR={many(a){for(const [k,d] of a){try{SR.on(k,d)}catch(e){console.error(e)}}},on(k,d){
+ if(k=='quota'){d._at=Date.now();Q=d;renderQ()}
+ if(k=='synced'){const p=[d.linked&&`${d.linked} linked`,d.sent&&`${d.sent} sent`,d.replied&&`${d.replied} replied 🎉`,d.followups&&`${d.followups} follow-up draft${d.followups>1?'s':''} ready in Gmail`,d.bounced&&`${d.bounced} bounced`].filter(Boolean);
+  (d.sent_to||[]).forEach(t=>toast(`Sent to ${t} ✓ The app will put follow-up 1 in your Gmail Drafts when it's due`,'okk'));
+  if(d.replied)toast(`${d.replied} ${d.replied>1?'people':'person'} replied 🎉 Answer them in Gmail`,'okk');
+  if(d.followups)toast(`${d.followups} follow-up${d.followups>1?'s are':' is'} ready in your Gmail Drafts: open Follow-ups and send ${d.followups>1?'them':'it'}`,'okk');
+  if(d.bounced)toast(`${d.bounced} email${d.bounced>1?'s':''} bounced (bad address)`,'err');
+  refresh();fuBadge();if($('#p-fu').classList.contains('on'))renderFu();if(p.length&&$('#p-leads').classList.contains('on'))loadLeads()}
+ if(k=='rescored'){if($('#p-leads').classList.contains('on'))loadLeads()}
+ if(k=='lead_update'){const l=LEADS.find(x=>x.channel_id==d.channel_id);if(l)Object.assign(l,d);log('email found on their site: '+d.email)}
+ if(k=='checked'){$('#pStats').textContent=`${d} channels looked at · ${found} good enough, added to Leads`}
+ if(k=='notice')toast(d,'okk');
+ if(k=='log'){log(d);const m=/: (\d+) channels/.exec(d);}
+ if(k=='error'){log('ERROR '+d);toast(d,'err')}
+ if(k=='progress'){if(d.n){$('#pTitle').textContent=`Search ${d.i} of ${d.n}`;$('#pb').style.width=Math.round(100*d.done/Math.max(1,d.total))+'%';$('#pb').parentElement.classList.remove('indet')}
+  else{$('#pTitle').textContent=`Search ${d.i}`+(d.round>1?` · round ${d.round}`:'')+' · keeps going until you stop';$('#pb').parentElement.classList.add('indet')}$('#pSub').textContent='“'+d.q+'”'}
+ if(k=='lead'){found++;const l=d,e=document.createElement('div');e.className='live';
+  e.innerHTML=`<div class="av" style="width:32px;height:32px;background-image:url('${esc(l.photo)}')"></div><div style="flex:1;min-width:0"><div class="nm">${esc(l.title)}</div><div class="meta">${esc(l.niche)} · ${fmt(l.subs)} subs${l.email?' · has email':''}</div></div>${tierTag(l)}`;
+  const lv=$('#live');lv.prepend(e);while(lv.children.length>150)lv.lastChild.remove();if(!window._rfT)window._rfT=setTimeout(()=>{window._rfT=0;refresh()},2000)}
+ if(k=='done'){$('#pb').style.width='100%';$('#pspin').style.display='none';$('#stop').disabled=false;
+  $('#pb').parentElement.classList.remove('indet');brainUI();$('#pTitle').textContent=d.found?`Found ${d.found} new lead${d.found>1?'s':''}`:d.quota_out?"Google's daily search limit reached":'No new leads this time';if(!d.found&&d.quota_out){const t=d.resets_in_min!=null?new Date(Date.now()+d.resets_in_min*6e4).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'';setTimeout(()=>{$('#pSub').textContent=`New searches are paused until ${t||'Google resets them'} (midnight US Pacific). Your quota units are fine. Meanwhile: use Find similar channels on your best leads, or email your Today list.`},0)}$('#pSub').textContent=`${d.searches?d.searches+' searches · ':''}checked ${d.checked} channels${d.stopped?' (stopped)':''}. ${d.found?'':'Try other niches or more searches; used searches rotate so the next run is different.'}`;
+  $('#stop').textContent=d.found?'View leads':'Back';$('#stop').onclick=()=>{$('#prog').classList.remove('on');$('#findForm').style.display='';if(d.found)go('leads')};refresh()}}};
+
+/* LEADS */
+function tierTag(l){return l.tier=='HIGH'?'<span class="tag ok">Great</span>':l.tier=='LOW'?'<span class="tag n" title="Re-scored with your current rules">Weak fit</span>':'<span class="tag warn">Good</span>'}
+function stTag(s){return{new:'',drafted:'<span class="tag acc">Drafted</span>',contacted:'<span class="tag n">Sent</span>',followup:'<span class="tag n">Following up</span>',pitched:'<span class="tag acc">Pitched</span>',replied:'<span class="tag ok">Replied</span>',meeting:'<span class="tag ok">Meeting</span>',client:'<span class="tag ok">Client</span>',no_answer:'<span class="tag n">No answer</span>',bounced:'<span class="tag bad" title="The email bounced, the address does not exist">Bad email</span>',denied:'<span class="tag bad">Denied</span>',skip:'<span class="tag n">Skipped</span>'}[s||'new']||''}
+const GRP={contacted:['drafted','contacted','followup'],won:['pitched','meeting','client'],closed:['no_answer','denied','bounced']};
+const inGrp=(st,f)=>f=='all'||(GRP[f]?GRP[f].includes(st):st==f);
+async function loadLeads(){LEADS=await getLeads();renderLeads();if(!loadLeads.w){loadLeads.w=1;view.slice(0,3).forEach(n=>api().prefetch(n.channel_id,true,false))}}
+let lst='new';$$('#lst button').forEach(b=>b.onclick=()=>{lst=b.dataset.v;$$('#lst button').forEach(x=>x.classList.toggle('on',x==b));renderLeads()});
+{let t=0;$('#lq').oninput=()=>{clearTimeout(t);t=setTimeout(renderLeads,120)}};$('#lsort').onchange=renderLeads;$('#lmail').onclick=()=>{mailOnly=!mailOnly;$('#lmail').classList.toggle('pri',mailOnly);renderLeads()};
+function renderLeads(){const q=$('#lq').value.trim().toLowerCase(),so=$('#lsort').value;
+ if(lst=='today'&&!TODAY){loadToday();return}const TS=lst=='today'?new Set(TODAY.ids):null;$('#todayBar').innerHTML=lst=='today'?todayHead():'';
+ view=LEADS.filter(l=>(TS?TS.has(l.channel_id)&&(l.status||'new')=='new':inGrp(l.status||'new',lst))&&sigOk(l)&&(!q||(l._q||(l._q=(l.title+' '+l.niche).toLowerCase())).includes(q))&&(!mailOnly||l.email));
+ if(TS){const o=TODAY.ids;view.sort((a,b)=>o.indexOf(a.channel_id)-o.indexOf(b.channel_id))}else view.sort((a,b)=>so=='added'?String(b.added).localeCompare(a.added):so=='growth'?(b.growth_x||0)-(a.growth_x||0):so=='subs'?b.subs-a.subs:b.score-a.score);
+ if(!view.length){$('#rows').innerHTML=`<div class="empty"><b>${LEADS.length?'Nothing here':'No leads yet'}</b>${LEADS.length?'Try another filter.':'Go to Find clients and run a search.'}</div>`;return}
+ vRender(true)}
+/* only the rows you can see are built (like a game only drawing what's on screen): thousands of leads scroll smoothly */
+const RH=67;let vLast='';
+function rowHTML(l,i){return `<div class="row${cur&&cur.channel_id==l.channel_id?' sel':''}" data-i="${i}" style="position:absolute;left:0;right:0;top:${i*RH}px;height:${RH}px">
+  <input type="checkbox" class="pick" data-id="${esc(l.channel_id)}"${PICK.has(l.channel_id)?' checked':''} title="Select (for deleting several at once)">
+  <div class="av" data-ch="${esc(l.url)}" title="Open their channel" style="cursor:pointer;background-image:url('${esc(l.photo)}')"></div>
+  <div style="min-width:0"><div class="nm">${esc(l.title)} ${stTag(l.status)}</div><div class="meta">${esc(l.niche)} · ${esc((l.reasons||[]).slice(0,2).join(' · '))}</div></div>
+  <div class="num hide-s"><b>${fmt(l.subs)}</b><span>subscribers</span></div>
+  <div class="num hide-s"><b>${l.growth_x>=1.6?'<span style="color:var(--ok)">↑ '+l.growth_x+'x</span>':fmt(l.median_views)}</b><span>${l.growth_x>=1.6?'growing':'views / video'}</span></div>
+  <div class="score">${l.tier=='MANUAL'?'<span class="tag n">'+esc(srcOf(l))+'</span>':`<div class="ring" style="--v:${l.score};--c:${l.tier=='HIGH'?'var(--ok)':l.tier=='LOW'?'var(--t3)':'var(--warn)'}"><span>${l.score}</span></div>${tierTag(l)}`}</div>
+  <div class="mail ${l.email?'y':'n'}" title="${l.email?esc(l.email):'No email found yet'}">${I.mail}</div></div>`}
+function vRender(force){const R=$('#rows');if(!view.length||!R.offsetParent)return;const M=R.closest('main')||document.scrollingElement;
+ R.style.position='relative';R.style.height=(view.length*RH)+'px';
+ const top=M.scrollTop-(R.getBoundingClientRect().top-M.getBoundingClientRect().top+M.scrollTop),a=Math.max(0,Math.floor(top/RH)-8),b=Math.min(view.length,Math.ceil((top+M.clientHeight)/RH)+8);
+ const key=a+':'+b+':'+view.length;if(!force&&key===vLast)return;vLast=key;let h='';for(let i=a;i<b;i++)h+=rowHTML(view[i],i);R.innerHTML=h;pickBar()}
+function vShow(l){const i=view.indexOf(l);if(i<0)return;const R=$('#rows'),M=R.closest('main');if(!M)return;const y=R.getBoundingClientRect().top-M.getBoundingClientRect().top+M.scrollTop+i*RH;
+ if(y<M.scrollTop+130)M.scrollTop=y-130;else if(y+RH>M.scrollTop+M.clientHeight)M.scrollTop=y+RH-M.clientHeight;vRender()}
+(()=>{const R=$('#rows'),M=R.closest('main');let raf=0;if(M)M.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>vRender())},{passive:true});window.addEventListener('resize',()=>vRender(true));
+ R.addEventListener('click',e=>{const c=e.target.closest('.pick');if(c){e.stopPropagation();c.checked?PICK.add(c.dataset.id):PICK.delete(c.dataset.id);pickBar();return}
+  const a=e.target.closest('[data-ch]');if(a){e.stopPropagation();return api().open(a.dataset.ch)}const r=e.target.closest('.row');if(r)openLead(view[+r.dataset.i])})})();
+function openLead(l){cur=l;vShow(l);$$('#rows .row').forEach(r=>r.classList.toggle('sel',view[+r.dataset.i]===l));
+ $('#dAv').style.backgroundImage=`url('${l.photo}')`;$('#dName').textContent=l.title;
+ try{api().prefetch(l.channel_id,true,true);const i=view.indexOf(l);view.slice(i+1,i+3).forEach(n=>api().prefetch(n.channel_id,true,false))}catch(e){}   /* this lead + the next two get their frames ready in the background */
+ $('#dMeta').innerHTML=`${esc(l.niche)} · <a href="#" class="linkb" id="dOpen">Open channel ↗</a> ${l.website?'· <a href="#" class="linkb" id="dSite">Website ↗</a>':''}`;
+ $('#dOpen').onclick=e=>{e.preventDefault();api().open(l.url)};if($('#dSite'))$('#dSite').onclick=e=>{e.preventDefault();api().open(l.website)};
+ $('#dStats').innerHTML=[['Score',l.score+' / 100'],['Subscribers',fmt(l.subs)],['Views / video',fmt(l.median_views)],['Growth',l.growth_x?l.growth_x+'x':'–']].map(([a,b])=>`<div class="stat"><span>${a}</span><b>${b}</b></div>`).join('');
+ const NEG=/lower budget|has a team|likely has|big channel|not growing|small channel|few views|slowing|no recent|company|already|too much|outside your filters|you skip these|not a native|no growth|fewer than|mostly shorts|agency/i;
+ $('#dWhy').innerHTML=(l.reasons||[]).map(r=>{const bad=NEG.test(r)&&!/^no editor/i.test(r);return `<div${bad?' style="color:var(--warn)"':''}>${bad?'<span style="width:16px;display:inline-block;text-align:center;font-weight:700">!</span>':I.check}<span>${esc(r)}</span></div>`}).join('');
+ const v=l.latest_video||{};$('#dVid').innerHTML=v.title?`<div class="vid" id="dV"><img src="${esc(v.thumbnail||('https://i.ytimg.com/vi/'+v.video_id+'/mqdefault.jpg'))}"><div style="min-width:0"><div style="font-weight:600">${esc(v.title)}</div><div class="small muted">${v.views?fmt(v.views)+' views · ':''}${esc(String(v.published||'').slice(0,10))}</div></div></div>`:'<div class="muted small">No recent video info.</div>';
+ if($('#dV'))$('#dV').onclick=()=>api().open(v.url);
+ $('#dStatus').value=l.status||'new';$('#dSrc').innerHTML=srcNames(true).map(n=>`<option>${esc(n)}</option>`).join('');$('#dSrc').value=srcOf(l);$('#dSrcWrap').style.display=(l.mode=='manual'||l.tier=='MANUAL')?'flex':'none';
+ $('#dEmail').value=l.email||'';$('#dFirst').value=l.first_name||'';$('#dNotes').value='';nameSrc();
+ $('#dContacts').innerHTML=l.contacts?'Also on: '+esc(l.contacts):'';
+ boostLead(l);hint();$('#dSubj').value=l.draft?.subject||'';$('#dBody').value=l.draft?.body||'';$('#dChecks').innerHTML='';$('#dEngInfo').textContent='';
+ loadTpl().then(()=>{if(cur===l)initCompose(l)});autoSelfie(l);
+ if($('#dBody').value)recheck();
+ $('#drawer').classList.add('on');$('#scrim').classList.add('on')}
+function nameSrc(){const g=cur.name_guess||{};$('#dNameSrc').textContent=cur.first_name&&g.name==cur.first_name&&g.src?'Found from '+g.src:(!cur.first_name&&g.name?`Maybe “${g.name}” (${g.src}), not sure enough to use`:'')}
+$('#dFindName').onclick=async()=>{const b=$('#dFindName');b.disabled=true;b.innerHTML='<span class="spin"></span>';const d=await api().find_name(cur.channel_id);b.disabled=false;b.textContent='Find';
+ if(d.first_name){$('#dFirst').value=d.first_name;cur.first_name=d.first_name;cur.name_guess={name:d.first_name,src:d.evidence};nameSrc();toast('Name: '+d.first_name+(d.confidence?' ('+d.confidence+' confidence)':''),'okk')}
+ else{$('#dNameSrc').textContent='No reliable first name found'+(d.evidence?': '+d.evidence:'')+'. The email will say “Hey,”.'}};
+$('#dSimilar').onclick=async()=>{const r=await api().similar(cur.channel_id);if(r.error)return toast(r.error,'err');closeD();go('find');$('#findForm').style.display='none';$('#prog').classList.add('on');startProg();$('#pTitle').textContent='Finding channels like '+cur.title};
+$('#lsheet').onclick=async()=>{const b=$('#lsheet');b.disabled=true;b.innerHTML='<span class="spin"></span>Syncing…';const r=await api().push_sheet(null);b.disabled=false;b.textContent='Sync sheet';
+ if(r.errors.length)return toast(r.errors[0],'err');toast(`Sheet synced: ${r.pushed} added, ${r.updated||0} updated`,'okk')};
+function hint(){const has=$('#dEmail').value.trim();$('#dHint').innerHTML=has?'':`<div class="hint"><span>⚠</span><div>No email found yet. ${cur.website?'<a href="#" class="linkb" id="dSiteMail" style="color:#f3cf86;text-decoration:underline">Search their website</a> or ':''}<a href="#" class="linkb" id="dAbout" style="color:#f3cf86;text-decoration:underline">open their About page</a>, click “View email address”, solve the captcha, then paste it above.</div></div>`;
+ if($('#dSiteMail'))$('#dSiteMail').onclick=async e=>{e.preventDefault();const a=e.target;a.textContent='Searching…';const r=await api().find_email(cur.channel_id);
+  if(r.email){$('#dEmail').value=r.email;cur.email=r.email;toast('Found '+r.email,'okk');hint();renderLeads()}else{a.textContent='Nothing on their site';}};
+ if($('#dAbout'))$('#dAbout').onclick=e=>{e.preventDefault();api().open(cur.url.replace(/\/$/,'')+'/about')}}
+function closeD(){saveCur();$('#drawer').classList.remove('on');$('#scrim').classList.remove('on')}
+$('#dClose').onclick=closeD;$('#dAv').style.cursor='pointer';$('#dAv').title='Open their channel';$('#dAv').onclick=()=>cur&&api().open(cur.url);$('#scrim').onclick=()=>{closeD();$('#addM').classList.remove('on')};
+function saveCur(){if(!cur)return;Object.assign(cur,{email:$('#dEmail').value.trim(),first_name:$('#dFirst').value.trim(),draft:{subject:$('#dSubj').value,body:$('#dBody').value,subjects:(cur.draft||{}).subjects||[]},fields:fv()});
+ return api().update_lead(cur.channel_id,{email:cur.email,first_name:cur.first_name,draft:cur.draft,fields:cur.fields})}
+$('#dEmail').onchange=()=>{saveCur();hint();renderLeads()};$('#dFirst').onchange=saveCur;
+/* ---------- compose: Flick-style fields + template ---------- */
+let TPL=null,SUBJ=[],autoBody=true,subjI=0;const FL=['name','niche','compliment','video'];
+async function loadTpl(){if(!TPL){const t=await api().email_template();TPL=t.template;SUBJ=t.subjects}}
+const fv=()=>{const o={};$$('.fld').forEach(x=>o[x.dataset.f]=x.value.trim());return o};
+function fillT(f){let b=TPL||'';if(!f.name)b=b.replace('Hey {name},','Hey,').replace(', {name}','').replace('{name}, ','');for(const k of FL)b=b.split('{'+k+'}').join(f[k]||'{'+k+'}');return b}
+function subjFor(f,i){const n=f.name;const o=SUBJ.filter(x=>n||!x.includes('{name}'));return (o[i%o.length]||'An opportunity for you').replace('{name}',n)}
+function rebuild(force){if($('#dStyle').value!='flick')return;if(!autoBody&&!force)return;$('#dBody').value=fillT(fv());autoBody=true;$('#dRebuild').style.display='none';
+ if(!$('#dSubj').value.trim()||force==='subj')$('#dSubj').value=subjFor(fv(),subjI);recheck()}
+function sugUI(sg){for(const k of FL){const el=$('#sg-'+k),opts=(sg&&sg[k]||[]).filter(x=>x!==undefined);el.innerHTML=opts.length>1?opts.map((o,i)=>`<b title="${esc(o||'(none)')}" data-k="${k}" data-i="${i}"></b>`).join(''):'';
+ const inp=$(`.fld[data-f="${k}"]`);el.querySelectorAll('b').forEach(b=>{b.classList.toggle('on',opts[+b.dataset.i]===inp.value);b.onclick=()=>{inp.value=opts[+b.dataset.i];sugUI(sg);rebuild();saveCur()}})}}
+function styleUI(){const f=$('#dStyle').value=='flick';$('#dFields').style.display=f?'':'none';$('#dNotesWrap').style.display=f?'none':'';$('#dWrite').lastChild.textContent=f?'Suggest with AI':'Write with AI';$('#dBody').placeholder=f?'Fill the fields above or press Suggest with AI':'Press Write with AI above: it watches their latest video and writes this for you'}
+$$('.fld').forEach(x=>x.oninput=()=>{sugUI(cur&&cur.fields_sugg);rebuild();clearTimeout(x._t);x._t=setTimeout(saveCur,500)});
+$('#dBody').addEventListener('input',()=>{if($('#dStyle').value=='flick'&&$('#dBody').value!==fillT(fv())){autoBody=false;$('#dRebuild').style.display=''}});
+$('#dRebuild').onclick=e=>{e.preventDefault();rebuild(true)};
+$('#dSubjNext').onclick=e=>{e.preventDefault();subjI++;const ss=cur&&cur.draft&&cur.draft.subjects;$('#dSubj').value=($('#dStyle').value!='flick'&&ss&&ss.length)?ss[subjI%ss.length]:subjFor(fv(),subjI);recheck();saveCur()};
+function initCompose(l){styleUI();const f=l.fields||{};const sg=l.fields_sugg||null;
+ const dflt={name:l.first_name||'',niche:(l.niche||'').toLowerCase(),compliment:'',video:''};
+ $$('.fld').forEach(x=>x.value=f[x.dataset.f]??(sg&&sg[x.dataset.f]&&sg[x.dataset.f][0])??dflt[x.dataset.f]??'');sugUI(sg);
+ autoBody=!l.draft?.body||l.draft.body===fillT(fv());$('#dRebuild').style.display=autoBody?'none':'';subjI=0;
+ if($('#dStyle').value=='flick'&&!l.draft?.body)rebuild(true)}
+$('#dWrite').onclick=async()=>{await saveCur();const b=$('#dWrite');b.disabled=true;const lbl=b.lastChild.textContent;b.innerHTML='<span class="spin"></span>Thinking…';
+ $('#dEngInfo').textContent='Reading their video, usually 20–60 seconds';
+ if($('#dStyle').value=='flick'){const d=await api().fields(cur.channel_id,$('#dEng').value);b.disabled=false;b.innerHTML=I.star+lbl;
+  if(d.error){$('#dEngInfo').textContent='';return toast(d.error,'err')}cur.fields_sugg=d.fields;
+  $$('.fld').forEach(x=>{const o=d.fields[x.dataset.f]||[];if(o.length&&(o[0]||x.dataset.f!='name'))x.value=o[0]});sugUI(d.fields);rebuild(true);saveCur();
+  $('#dEngInfo').innerHTML=d.engine=='template'?'<span style="color:var(--warn)">No AI available</span>, filled what it could':(d.engine=='claude'?'Claude Sonnet':'Ollama')+(d.transcript?' · watched the transcript':' · title only')+' · click the dots to swap options';return}
+ const d=await api().write(cur.channel_id,$('#dNotes').value,$('#dEng').value,$('#dStyle').value);b.disabled=false;b.innerHTML=I.star+lbl;
+ if(d.error){$('#dEngInfo').textContent='';return toast(d.error,'err')}
+ $('#dSubj').value=d.subject;$('#dBody').value=d.body;cur.draft={subject:d.subject,body:d.body,subjects:d.subjects||[]};subjI=0;
+ if(d.first_name&&!$('#dFirst').value){$('#dFirst').value=d.first_name;cur.first_name=d.first_name;cur.name_guess={name:d.first_name,src:'Claude: '+(d.name_evidence||'')};nameSrc()}
+ $('#dEngInfo').innerHTML=d.engine=='template'?'<span style="color:var(--warn)">AI unavailable, used your template</span>: change the first line to one thing you liked in their video'+(d.warning?' <span class="muted">('+esc(d.warning.replace(/^claude: /,''))+')</span>':''):'Written by '+(d.engine=='claude'?'Claude Sonnet':'Ollama')+(d.transcript?' · watched the transcript':' · title only (no transcript)');checks(d.issues)};
+
+/* ---------- selfie editor (drag corners, image choice, realism) ---------- */
+const FXS=[['#','Whole photo (you + the screen together)'],['g_temp','Temperature (cool ↔ warm)',-1,1,0.01],['g_tint','Tint (green ↔ magenta)',-1,1,0.01],['g_bright','Brightness',0.6,1.4,0.01],['g_contrast','Contrast',0.6,1.4,0.01],['g_sat','Saturation',0,1.6,0.01],
+ ['#','Screen image only'],['temp','Temperature (cool ↔ warm)',-1,1,0.01],['tint','Tint (green ↔ magenta)',-1,1,0.01],['brightness','Brightness',0.5,1.5,0.01],['contrast','Contrast',0.5,1.5,0.01],['saturation','Saturation',0,1.5,0.01],
+ ['#','Realism'],['glow','Screen glow',0,0.6,0.01],['soft','Softness',0,3,0.1],['reflect','Real screen showing through',0,0.4,0.01],['match','Match my camera (exposure + tint)',0,1,0.01],['grain','Camera grain',0,2,0.05],['falloff','Screen brightness falloff',0,1.5,0.05]];
+const FXD={brightness:1,contrast:0.95,saturation:0.97,glow:0.1,soft:0.6,reflect:0.06,match:0.5,grain:1,falloff:0.7,temp:0,tint:0,g_temp:0,g_tint:0,g_bright:1,g_contrast:1,g_sat:1};
+const SX={lead:null,base:null,quad:null,fx:{...FXD},src:'thumb',img:null,srcs:[],k:1,W:0,H:0};
+function loadImg(u){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=u})}
+function placeholder(){const c=document.createElement('canvas');c.width=1280;c.height=720;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,1280,720);gr.addColorStop(0,'#5a46f0');gr.addColorStop(1,'#e2913b');g.fillStyle=gr;g.fillRect(0,0,1280,720);
+ g.fillStyle='rgba(255,255,255,.9)';g.font='bold 86px Inter,Segoe UI,sans-serif';g.textAlign='center';g.fillText('Their video here',640,390);return c}
+function homog(q){const[x0,y0]=q[0],[x1,y1]=q[1],[x2,y2]=q[2],[x3,y3]=q[3];const dx1=x1-x2,dx2=x3-x2,dx3=x0-x1+x2-x3,dy1=y1-y2,dy2=y3-y2,dy3=y0-y1+y2-y3;let g=0,h=0;
+ if(dx3||dy3){const den=dx1*dy2-dx2*dy1;g=(dx3*dy2-dx2*dy3)/den;h=(dx1*dy3-dx3*dy1)/den}
+ const a=x1-x0+g*x1,b=x3-x0+h*x3,c=x0,d=y1-y0+g*y1,e=y3-y0+h*y3,f=y0;return(u,v)=>{const w=g*u+h*v+1;return[(a*u+b*v+c)/w,(d*u+e*v+f)/w]}}
+function tri(ctx,img,s0,s1,s2,d0,d1,d2){const den=s0[0]*(s1[1]-s2[1])+s1[0]*(s2[1]-s0[1])+s2[0]*(s0[1]-s1[1]);if(!den)return;
+ const a=(d0[0]*(s1[1]-s2[1])+d1[0]*(s2[1]-s0[1])+d2[0]*(s0[1]-s1[1]))/den,b=(d0[1]*(s1[1]-s2[1])+d1[1]*(s2[1]-s0[1])+d2[1]*(s0[1]-s1[1]))/den,
+ c=(d0[0]*(s2[0]-s1[0])+d1[0]*(s0[0]-s2[0])+d2[0]*(s1[0]-s0[0]))/den,d=(d0[1]*(s2[0]-s1[0])+d1[1]*(s0[0]-s2[0])+d2[1]*(s1[0]-s0[0]))/den,
+ e=(d0[0]*(s1[0]*s2[1]-s2[0]*s1[1])+d1[0]*(s2[0]*s0[1]-s0[0]*s2[1])+d2[0]*(s0[0]*s1[1]-s1[0]*s0[1]))/den,f=(d0[1]*(s1[0]*s2[1]-s2[0]*s1[1])+d1[1]*(s2[0]*s0[1]-s0[0]*s2[1])+d2[1]*(s0[0]*s1[1]-s1[0]*s0[1]))/den;
+ const cx=(d0[0]+d1[0]+d2[0])/3,cy=(d0[1]+d1[1]+d2[1])/3,ex=p=>[p[0]+(p[0]-cx)*0.04,p[1]+(p[1]-cy)*0.04];const[e0,e1,e2]=[ex(d0),ex(d1),ex(d2)];
+ ctx.save();ctx.beginPath();ctx.moveTo(...e0);ctx.lineTo(...e1);ctx.lineTo(...e2);ctx.closePath();ctx.clip();ctx.transform(a,b,c,d,e,f);ctx.drawImage(img,0,0);ctx.restore()}
+function warpTo(ctx,img,quad){const H=homog(quad),N=12,w=img.width,h=img.height;
+ for(let i=0;i<N;i++)for(let j=0;j<N;j++){const u0=i/N,u1=(i+1)/N,v0=j/N,v1=(j+1)/N;const p00=H(u0,v0),p10=H(u1,v0),p11=H(u1,v1),p01=H(u0,v1);
+  tri(ctx,img,[u0*w,v0*h],[u1*w,v0*h],[u1*w,v1*h],p00,p10,p11);tri(ctx,img,[u0*w,v0*h],[u1*w,v1*h],[u0*w,v1*h],p00,p11,p01)}}
+/* the quick canvas preview runs while you drag; once you stop, the app renders the EXACT final image (same code as the email) and shows that */
+/* one renderer for everything: once the first exact image is in, every change (drag, slider) asks the app for the exact
+   picture again, one at a time, and shows each as it arrives. No switching between two different-looking previews. */
+function sxQueueFinal(){if(!SX.lead||!SX.quad||!SX.src)return;SX.want=(SX.want||0)+1;clearTimeout(SX.ft);SX.ft=setTimeout(sxPump,SX.fin?0:120)}
+async function sxPump(){if(SX.busy)return;const v=SX.want;SX.busy=true;const c=$('#sfxC');if(!SX.fin)$('#sfxBadge').textContent='Rendering…';
+ try{const dragging=!!SX.dragging,w=Math.round(c.width*(dragging?1:(window.devicePixelRatio||1)));
+  const r=await api().selfie_preview(SX.lead.channel_id,{quad:SX.quad,src:SX.src,fx:SX.fx},w);
+  if(r&&r.img){const im=await loadImg(r.img);if(im){SX.fin=im;c.getContext('2d').drawImage(im,0,0,c.width,c.height);$('#sfxBadge').textContent='Exact preview (this is what gets sent)'}}
+  else if(r&&r.error)$('#sfxBadge').textContent='Preview: '+r.error}
+ finally{SX.busy=false}
+ if(SX.want!==v)sxPump();else if(SX.lowres&&!SX.dragging){SX.lowres=false;SX.want++;sxPump()}}
+function sxDraw(){if(!SX.base)return;sxQueueFinal();if(SX.fin&&SX.lead){const c0=$('#sfxC');c0.getContext('2d').drawImage(SX.fin,0,0,c0.width,c0.height);return}const c=$('#sfxC'),ctx=c.getContext('2d'),k=SX.k,fx=SX.fx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(SX.base,0,0,c.width,c.height);
+ if(!SX.img||!SX.quad)return;const q=SX.quad.map(p=>[p[0]*k,p[1]*k]);
+ const t=document.createElement('canvas');t.width=SX.img.width;t.height=SX.img.height;const tc=t.getContext('2d');tc.filter=`brightness(${fx.brightness}) contrast(${fx.contrast}) saturate(${fx.saturation})`;tc.drawImage(SX.img,0,0);tc.filter='none';tempLayer(tc,t.width,t.height,fx.temp,fx.tint);
+ const w=document.createElement('canvas');w.width=c.width;w.height=c.height;const wc=w.getContext('2d');warpTo(wc,t,q);
+ if(fx.glow>0){ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=fx.glow;ctx.filter=`blur(${Math.max(c.width,c.height)/60}px)`;ctx.drawImage(w,0,0);ctx.restore()}
+ ctx.save();ctx.filter=fx.soft>0?`blur(${fx.soft*k}px)`:'none';ctx.drawImage(w,0,0);ctx.restore();
+ if(fx.reflect>0){ctx.save();ctx.beginPath();q.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.clip();ctx.globalAlpha=fx.reflect;ctx.drawImage(SX.base,0,0,c.width,c.height);ctx.restore()}
+ if(fx.g_bright!=1||fx.g_contrast!=1||fx.g_sat!=1){const g=document.createElement('canvas');g.width=c.width;g.height=c.height;g.getContext('2d').drawImage(c,0,0);ctx.save();ctx.filter=`brightness(${fx.g_bright}) contrast(${fx.g_contrast}) saturate(${fx.g_sat})`;ctx.drawImage(g,0,0);ctx.restore()}
+ tempLayer(ctx,c.width,c.height,fx.g_temp,fx.g_tint)}
+/* quick on-screen approximation of temperature/tint while dragging (the exact preview follows half a second later) */
+function tempLayer(x,w,h,t,ti){t=+t||0;ti=+ti||0;if(!t&&!ti)return;x.save();x.globalCompositeOperation='soft-light';
+ if(t){x.globalAlpha=Math.min(1,Math.abs(t)*.55);x.fillStyle=t>0?'#ff9a2e':'#2e8bff';x.fillRect(0,0,w,h)}
+ if(ti){x.globalAlpha=Math.min(1,Math.abs(ti)*.45);x.fillStyle=ti>0?'#ff3ad1':'#3aff6a';x.fillRect(0,0,w,h)}x.restore()}
+function sxHandles(){$$('#sfxStage .hdl').forEach(h=>h.remove());if(!SX.quad)return;const c=$('#sfxC'),r=c.getBoundingClientRect(),st=$('#sfxStage').getBoundingClientRect(),dk=r.width/c.width;
+ SX.quad.forEach((p,i)=>{const h=document.createElement('div');h.className='hdl';h.style.left=(r.left-st.left+p[0]*SX.k*dk)+'px';h.style.top=(r.top-st.top+p[1]*SX.k*dk)+'px';
+  h.onpointerdown=e=>{h.setPointerCapture(e.pointerId);SX.dragging=true;SX.lowres=true;h.onpointermove=ev=>{const rr=c.getBoundingClientRect();SX.quad[i]=[Math.round((ev.clientX-rr.left)/dk/SX.k),Math.round((ev.clientY-rr.top)/dk/SX.k)];
+   h.style.left=(ev.clientX-st.left)+'px';h.style.top=(ev.clientY-st.top)+'px';sxLoupe(i,ev.clientX-st.left,ev.clientY-st.top);cancelAnimationFrame(SX.raf);SX.raf=requestAnimationFrame(sxDraw)};
+   SX.sel=i;$$('#sfxStage .hdl').forEach((x,j)=>x.classList.toggle('sel',j==i));sxLoupe(i,parseFloat(h.style.left),parseFloat(h.style.top));
+   h.onpointerup=()=>{h.onpointermove=null;SX.dragging=false;$('#sfxL').style.display='none';sxQueueFinal()}};
+  $('#sfxStage').appendChild(h)})}
+/* magnifier: shows your real photo around the dot at full resolution so the corner lands exactly on the screen's edge */
+function sxLoupe(i,x,y){const L=$('#sfxL'),g=L.getContext('2d'),p=SX.quad[i],Z=4,R=L.width/2,src=R/Z;L.style.display='block';
+ const sw=$('#sfxStage').clientWidth;L.style.left=(x+(x+R*2+30>sw?-R*2-30:30))+'px';L.style.top=Math.max(0,y-R*2-20)+'px';
+ g.imageSmoothingEnabled=false;g.fillStyle='#000';g.fillRect(0,0,L.width,L.height);g.drawImage(SX.base,p[0]-src,p[1]-src,src*2,src*2,0,0,L.width,L.height);
+ g.strokeStyle='rgba(124,92,255,.95)';g.lineWidth=1;g.beginPath();g.moveTo(R,0);g.lineTo(R,L.height);g.moveTo(0,R);g.lineTo(L.width,R);g.stroke()}
+/* arrow keys nudge the last dot by 1 pixel of your photo (Shift = 10) */
+document.addEventListener('keydown',e=>{if(!$('#sfx').classList.contains('on')||SX.sel==null||!/^Arrow/.test(e.key)||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;e.preventDefault();
+ const d=e.shiftKey?10:1,p=SX.quad[SX.sel];if(e.key=='ArrowLeft')p[0]-=d;if(e.key=='ArrowRight')p[0]+=d;if(e.key=='ArrowUp')p[1]-=d;if(e.key=='ArrowDown')p[1]+=d;
+ const i=SX.sel;sxDraw();sxHandles();SX.sel=i;const h=$$('#sfxStage .hdl')[i];h.classList.add('sel');sxLoupe(i,parseFloat(h.style.left),parseFloat(h.style.top));clearTimeout(SX.lt);SX.lt=setTimeout(()=>$('#sfxL').style.display='none',900)});
+function sxSize(){const c=$('#sfxC'),st=$('#sfxStage');const mw=st.clientWidth-24,mh=st.clientHeight-24;SX.k=Math.min(1,mw/SX.base.width,mh/SX.base.height);c.width=Math.round(SX.base.width*SX.k);c.height=Math.round(SX.base.height*SX.k);sxDraw();setTimeout(sxHandles,0)}
+function sxSliders(){$('#sfxSl').innerHTML=FXS.map(([k,l,a,b,st])=>k=='#'?`<div class="lbl" style="margin-top:8px">${l}</div>`:`<div class="sl"><label>${l}<span id="sv-${k}">${(+SX.fx[k]).toFixed(2)}</span></label><input type="range" min="${a}" max="${b}" step="${st}" value="${SX.fx[k]}" data-k="${k}"></div>`).join('');
+ const fill=x=>x.style.setProperty('--p',((x.value-x.min)/(x.max-x.min)*100)+'%');$$('#sfxSl input').forEach(fill);
+ $$('#sfxSl input').forEach(x=>x.oninput=()=>{fill(x);SX.fx[x.dataset.k]=+x.value;$('#sv-'+x.dataset.k).textContent=(+x.value).toFixed(2);cancelAnimationFrame(SX.raf);SX.raf=requestAnimationFrame(sxDraw)})}
+async function sxSetSrc(id,url){SX.src=id;$$('#sfxSrcs .st').forEach(x=>x.classList.toggle('on',x.dataset.id===id));SX.img=await loadImg(url)||placeholder();sxDraw()}
+async function openSelfie(lead){SX.fin=null;SX.want=0;const b=await api().selfie_base();if(!b)return toast('Pick your selfie photo in Setup first','err');
+ SX.lead=lead;SX.base=await loadImg(b.img);const P=(lead&&lead.selfie_params)||{};SX.fx={...FXD,...(b.fx||{}),...(P.fx||{})};
+ SX.quad=(P.quad||b.monitor||null);if(!SX.quad){const W=SX.base.width,H=SX.base.height;SX.quad=[[W*.2,H*.2],[W*.6,H*.2],[W*.6,H*.55],[W*.2,H*.55]]}SX.quad=SX.quad.map(p=>[...p]);
+ $('#sfx').classList.add('on');sxSliders();
+ if(lead){const r=await api().selfie_sources(lead.channel_id);SX.srcs=r.sources||[];
+  $('#sfxSrcs').innerHTML=SX.srcs.map(x=>`<div class="st${x.id=='thumb'?'':' ld'}" data-id="${x.id}" style="${x.id=='thumb'?`background-image:url('${x.url}')`:''}"><span>${x.label}</span></div>`).join('');
+  /* real frames + cleaned-up stills come from the app (yt-dlp + ffmpeg), a few seconds each, so they fill in as they arrive */
+  const get=x=>x.p||(x.p=x.id=='thumb'?Promise.resolve(x.hi):api().selfie_src_img(lead.channel_id,x.id).then(r=>{const t=$(`#sfxSrcs .st[data-id="${x.id}"]`);
+   if(r&&r.img){x.hi=r.img;if(t){t.style.backgroundImage=`url('${r.img}')`;t.classList.remove('ld')}return r.img}if(t){t.classList.add('bad');t.style.display='none';t.classList.remove('ld');t.title=(r&&r.error)||'Not available'}return null}));
+  $$('#sfxSrcs .st').forEach(t=>t.onclick=async()=>{const x=SX.srcs.find(y=>y.id==t.dataset.id);const u=await get(x);if(u)sxSetSrc(x.id,u);else toast((t.title||'Not available for this video'),'err')});
+  const cs=P.src||'frame1',x=SX.srcs.find(y=>y.id==cs);SX.srcs.forEach(get);
+  if(x){let u=await get(x);let y=x;if(!u)for(const z of SX.srcs){u=await get(z);if(u){y=z;break}}if(u)await sxSetSrc(y.id,u);else SX.img=placeholder()}else if(String(cs).startsWith('file:')){SX.src=cs;SX.img=placeholder()}else{SX.img=placeholder()}}
+ else{$('#sfxSrcs').innerHTML='<div class="small muted" style="grid-column:1/-1">Open a lead to choose from their thumbnail and video stills.</div>';SX.img=placeholder()}
+ $('#sfxUse').textContent=lead?'Use this':'Save corners';sxSize()}
+window.addEventListener('resize',()=>{if($('#sfx').classList.contains('on'))sxSize()});
+$('#sfxFile').onclick=async()=>{const r=await api().selfie_pick_file();if(!r)return;SX.src=r.src;$$('#sfxSrcs .st').forEach(x=>x.classList.remove('on'));SX.img=await loadImg(r.img);sxDraw()};
+$('#sfxReset').onclick=()=>{SX.fx={...FXD};sxSliders();sxDraw()};
+$('#sfxCancel').onclick=()=>$('#sfx').classList.remove('on');
+async function sxSave(makeDefault){const params={quad:SX.quad,fx:SX.fx,src:SX.src,mode:'selfie'};
+ if(!SX.lead){await api().set_monitor(SX.quad);await api().save_selfie_fx(SX.fx);toast('Saved as your default','okk');$('#sfx').classList.remove('on');renderSetup();return}
+ const b=$('#sfxUse');b.disabled=true;b.innerHTML='<span class="spin"></span>Rendering…';const r=await api().selfie_render(SX.lead.channel_id,params,makeDefault);b.disabled=false;b.textContent='Use this';
+ if(r.error)return toast(r.error,'err');SX.lead.selfie_params=params;$('#dImg').src=r.img;$('#dImg').style.display='block';$('#dSelfieInfo').textContent='';if(makeDefault)toast('Saved as your default for every lead','okk');$('#sfx').classList.remove('on')}
+$('#sfxUse').onclick=()=>sxSave(false);$('#sfxDefault').onclick=()=>sxSave(true);
+$('#dSelfie').onclick=()=>openSelfie(cur);$('#dImg').onclick=()=>{if(imgMode(cur)!='frame')openSelfie(cur)};
+function imgMode(l){return (l.selfie_params&&l.selfie_params.mode)||ST.settings.img_mode||'selfie'}
+/* picture choice: your selfie with their video on screen, or a plain frame from their video (pick one of a few) */
+async function frameOpts(l){const box=$('#dFrames');if(imgMode(l)!='frame'){box.style.display='none';return}box.style.display='grid';
+ const r=await api().selfie_sources(l.channel_id);if(cur!==l)return;const S=(r.sources||[]),curSrc=(l.selfie_params&&l.selfie_params.src)||'frame1';
+ box.innerHTML=S.map(x=>`<div class="st ld${x.id==curSrc?' on':''}" data-id="${x.id}"><span>${esc(x.label.replace('Frame: ',''))}</span></div>`).join('');
+ S.forEach(async x=>{const t=box.querySelector(`[data-id="${x.id}"]`);const g=x.id=='thumb'?{img:x.url||x.hi}:await api().selfie_src_img(l.channel_id,x.id,true);if(!t)return;t.classList.remove('ld');
+  if(g&&g.img){t.style.backgroundImage=`url('${g.img}')`;t.onclick=async()=>{$$('#dFrames .st').forEach(y=>y.classList.toggle('on',y===t));l.selfie_params=Object.assign(l.selfie_params||{},{mode:'frame',src:x.id});
+   $('#dImg').src=g.img;$('#dImg').style.display='block';$('#dSelfieInfo').textContent='this frame goes in the email';api().set_img(l.channel_id,'frame',x.id,false).then(()=>{if(cur===l)autoSelfie(l)})}}
+  else{t.classList.add('bad');t.style.display='none';t.title=(g&&g.error)||'Not available'}})}
+function modeSeg(l){const m=imgMode(l);$$('#dImgMode button').forEach(b=>b.classList.toggle('on',b.dataset.m==m));$('#dSelfie').style.display=m=='frame'?'none':''}
+$$('#dImgMode button').forEach(b=>b.onclick=()=>{if(!cur)return;const l=cur,m=b.dataset.m;
+ /* switch instantly; saving + the new picture happen in the background (grabbing a frame can take a few seconds) */
+ l.selfie_params=Object.assign(l.selfie_params||{},{mode:m});if(m=='frame'&&!/^(frame|hq|thumb)/.test(l.selfie_params.src||''))l.selfie_params.src='frame1';
+ ST.settings.img_mode=m;modeSeg(l);$('#dAttach').checked=true;
+ api().set_img(l.channel_id,m,m=='frame'?l.selfie_params.src:null,true).catch(()=>{}).finally(async()=>{if(cur!==l)return;autoSelfie(l);
+  const r=await api().fit_picture(l.channel_id,$('#dBody').value);if(cur===l&&r&&r.body&&r.body!==$('#dBody').value){$('#dBody').value=r.body;saveCur();recheck()}})});
+async function autoSelfie(l,keep){if(!keep)$('#dImg').style.display='none';modeSeg(l);frameOpts(l);const fm=imgMode(l)=='frame';if(!fm&&!(SS&&SS.selfie&&SS.monitor)){$('#dSelfieInfo').textContent='Set up your selfie in Setup first, or pick "Just a frame"';return}
+ if(!keep)$('#dSelfieInfo').textContent=fm?'grabbing a frame from their video…':'making your selfie…';const v=l._sv=(l._sv||0)+1;const r=await api().selfie_render(l.channel_id,l.selfie_params||{},false);if(cur!==l||v!==l._sv)return;
+ if(r.error){$('#dSelfieInfo').textContent=r.error;return}$('#dSelfieInfo').textContent=(fm?'this frame goes in the email':'click it to adjust')+(r.upgrade?' · sharper frame loading…':'');$('#dImg').src=r.img;$('#dImg').style.display='block';
+ /* shown instantly with YouTube's still; swap in the real frame as soon as it's grabbed (in the background) */
+ if(r.upgrade){let n=0;const tick=async()=>{if(cur!==l||v!==l._sv||++n>30)return;if(await api().frame_ready(l.channel_id,r.src))return autoSelfie(l,true);setTimeout(tick,1500)};setTimeout(tick,1200)}}
+function checks(a){$('#dChecks').innerHTML=a&&a.length?a.map(x=>`<span class="tag warn">${esc(x)}</span>`).join(''):'<span class="tag ok">✓ Follows your outreach system</span>'}
+let rt;function recheck(){clearTimeout(rt);rt=setTimeout(async()=>checks(await api().recheck($('#dSubj').value,$('#dBody').value,$('#dStyle').value)),350)}
+$('#dBody').oninput=$('#dSubj').oninput=recheck;$('#dStyle').onchange=()=>{styleUI();if($('#dStyle').value=='flick')rebuild(true);recheck();savePrefs()};
+$('#dDraft').onclick=async()=>{await saveCur();if(!cur.email)return toast('Add their email first','err');if(!$('#dBody').value.trim())return toast('Write the email first','err');
+ if(/\{(name|niche|compliment|video)\}/.test($('#dBody').value))return toast('Fill the empty fields first','err');
+ const b=$('#dDraft');b.disabled=true;b.innerHTML='<span class="spin"></span>Opening…';
+ const r=await api().open_in_gmail(cur.channel_id,$('#dSubj').value,$('#dBody').value,$('#dAttach').checked,$('#dStyle').value,cur._forceDup===true);b.disabled=false;b.innerHTML=I.mail+'Open in Gmail';
+ if(r.dup){cur._forceDup=true;return toast(r.error,'err')}cur._forceDup=false;if(r.error)return toast(r.error,'err');
+ if(r.test){toast('Test email to yourself: opened in your browser. This lead stays as it is (not marked as emailed).','okk');if(r.note)toast(r.note,'okk');return}
+ if(r.opened=='compose'&&!r.acct)toast('Tip: put your outreach Gmail in Setup so it never opens in another account (like school)','err');
+ toast(r.opened=='draft'?'Opened in Gmail. Check it and press Send, that\'s it: the app notices by itself':'Gmail opened. Click the "(press Ctrl+V…)" line, paste the picture and press Send. The app notices by itself','okk');
+ cur.status='drafted';refresh();loadLeads()};
+if($('#dSent'))$('#dSent').onclick=async()=>{const t=await api().i_sent_it(cur.channel_id);if(t&&t.test)return toast('That was a test to your own email, so the lead stays as it is.','okk');cur.status='contacted';$('#dStatus').value='contacted';$('#dSent').classList.remove('pri');toast('Marked as sent. Follow-ups start tomorrow.','okk');refresh();goalUI();next()};
+$('#dCopy').onclick=()=>{api().copy(($('#dSubj').value?$('#dSubj').value+'\n\n':'')+$('#dBody').value);toast('Copied','okk')};
+$('#dStatus').onchange=async()=>{const v=$('#dStatus').value;await api().set_status(cur.channel_id,v);cur.status=v;toast('Status updated, sheet too','okk');renderLeads();refresh()};
+$('#dSrc').onchange=async()=>{cur.source=$('#dSrc').value;await api().set_source(cur.channel_id,cur.source);toast('Source: '+cur.source,'okk')};
+$('#dSkip').onclick=async()=>{await api().set_status(cur.channel_id,'skip');toast('Skipped');next()};
+$('#dNever').onclick=async()=>{const r=await api().delete([cur.channel_id]);undoToast(r);next()};
+async function next(){const i=view.indexOf(cur);await loadLeads();refresh();if(view.length){openLead(view[Math.min(i,view.length-1)])}else closeD()}
+document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){if(e.key=='Escape')document.activeElement.blur();return}
+ if(e.key=='Escape')closeD();if(!$('#p-leads').classList.contains('on')||!view.length)return;
+ const i=cur?view.indexOf(cur):-1;if(e.key=='j'||e.key=='ArrowDown'){openLead(view[Math.min(view.length-1,i+1)]);e.preventDefault()}
+ if(e.key=='k'||e.key=='ArrowUp'){openLead(view[Math.max(0,i-1)]);e.preventDefault()}if(e.key=='Enter'&&!cur)openLead(view[0])});
+
+/* PIPELINE */
+const RANK={bounced:0,new:0,drafted:0,skip:0,contacted:1,followup:1,no_answer:1,denied:1,replied:2,meeting:2,pitched:3,client:4};
+function srcOf(l){return l.source||(l.mode=='manual'?'Other':'Cold email')}
+function srcNames(all){const S=(ST&&ST.settings.sources)||[];return S.filter(x=>all||x.on).map(x=>x.name)}
+function reach(l){let r=RANK[l.status]||0;for(const h of l.history||[])r=Math.max(r,RANK[h.status]||0);if(l.outreach&&l.outreach.sent_at)r=Math.max(r,1);return r}
+function startAt(l){const h=(l.history||[]).find(h=>(RANK[h.status]||0)>=1);return new Date((l.outreach&&l.outreach.sent_at)||(h&&h.t)||l.added||0)}
+let prange=0;$$('#prange button').forEach(b=>b.onclick=()=>{prange=+b.dataset.v;$$('#prange button').forEach(x=>x.classList.toggle('on',x==b));renderPipe()});
+const pc=(a,b)=>b?Math.round(a/b*1000)/10:null;
+const cell=(v,c)=>v==null?'<span class="muted">–</span>':`<div class="pct"><em>${v}%</em><div class="bar" style="--c:${c}"><i style="width:${Math.min(100,v)}%"></i></div></div>`;
+async function renderPipe(){const L=await getLeads(),now=Date.now();
+ const inR=l=>!prange||now-startAt(l)<=prange*864e5;const fresh=L.filter(l=>reach(l)==0&&!['skip'].includes(l.status)).length;
+ const on=srcNames(false),rows={};on.forEach(n=>rows[n]=[0,0,0,0]);
+ for(const l of L){const r=reach(l);if(r<1||!inR(l))continue;const s=srcOf(l);if(!rows[s])rows[s]=[0,0,0,0];for(let i=0;i<r;i++)rows[s][i]++}
+ const T=[0,0,0,0];Object.values(rows).forEach(v=>v.forEach((x,i)=>T[i]+=x));
+ $('#funnel').innerHTML=`<div class="fs"><span>Not contacted</span><b>${fresh}</b><i>leads waiting</i></div>`+
+  [['a','Outreached',T[0],null],['b','Engaged',T[1],pc(T[1],T[0])],['c','Pitched',T[2],pc(T[2],T[1])],['d','Closed',T[3],pc(T[3],T[2])]].map(([k,n,v,c])=>`<div class="fs ${k}"><span>${n}</span><b>${v}</b>${c!=null?`<em class="cv">${c}%</em>`:''}<i>${k=='a'?'first messages sent':k=='b'?'replied':k=='c'?'got a price':'clients'}</i></div>`).join('');
+ const line=(n,v,cls='')=>`<div class="pt ${cls}"><div>${esc(n)}</div><div>${v[0]}</div><div>${v[1]}</div><div>${cell(pc(v[1],v[0]),'#4f8cff')}</div><div>${v[2]}</div><div>${cell(pc(v[2],v[1]),'#d36ad6')}</div><div>${v[3]}</div><div>${cell(pc(v[3],v[2]),'var(--ok)')}</div><div>${cell(pc(v[3],v[0]),'#e2913b')}</div></div>`;
+ $('#ptable').innerHTML='<div class="pt h"><div>Source</div><div>Outreached</div><div>Engaged</div><div>Reply rate</div><div>Pitched</div><div>Pitch rate</div><div>Clients</div><div>Win rate</div><div>Overall</div></div>'+
+  Object.keys(rows).map(n=>line(n,rows[n])).join('')+line('Total',T,'tot');
+ const SN={best:'Best of both',flick:'Flick style',ask:'Ask first',proof:'With sample link',warm:'Job post reply'},sr={};
+ for(const l of L){const r=reach(l);if(r<1||!inR(l)||!l.outreach||!l.outreach.style)continue;const k=SN[l.outreach.style]||l.outreach.style;sr[k]=sr[k]||[0,0,0,0];for(let i=0;i<r;i++)sr[k][i]++}
+ $('#stable').innerHTML=Object.keys(sr).length?'<div class="pt h"><div>Style</div><div>Sent</div><div>Replied</div><div>Reply rate</div><div>Pitched</div><div>Pitch rate</div><div>Clients</div><div>Win rate</div><div>Overall</div></div>'+Object.keys(sr).sort((a,b)=>sr[b][0]-sr[a][0]).map(n=>line(n+(sr[n][0]<30?' (too early)':''),sr[n])).join(''):'<div class="muted small" style="padding:12px">Shows up once you send emails from the app.</div>';
+ renderSrc()}
+function renderSrc(){const S=ST.settings.sources||[];$('#srcChips').innerHTML=S.map((x,i)=>`<span class="chip${x.on?' on':''}" data-i="${i}">${esc(x.name)}</span>`).join('');
+ $$('#srcChips .chip').forEach(c=>c.onclick=()=>{S[+c.dataset.i].on=!S[+c.dataset.i].on;api().save_sources(S);renderPipe()})}
+$('#srcBtn').onclick=()=>{const c=$('#srcCard');c.style.display=c.style.display=='none'?'':'none'};
+$('#srcAdd').onclick=()=>{const n=$('#srcNew').value.trim();if(!n)return;const S=ST.settings.sources;if(!S.some(x=>x.name.toLowerCase()==n.toLowerCase()))S.push({name:n,on:true});$('#srcNew').value='';api().save_sources(S);renderPipe()};
+function openAdd(pre={}){$('#mS').innerHTML=srcNames(true).map(n=>`<option>${esc(n)}</option>`).join('');$('#mT').value=pre.title||'';$('#mU').value=pre.url||'';$('#mE').value=pre.email||'';$('#mN').value=pre.notes||'';
+ $('#mS').value=pre.source||srcNames(false)[0]||'Other';$('#mSt').value='contacted';$('#addM').classList.add('on');$('#scrim').classList.add('on')}
+$('#addBtn').onclick=()=>openAdd();$('#addX').onclick=()=>{$('#addM').classList.remove('on');$('#scrim').classList.remove('on')};
+$('#mSave').onclick=async()=>{if(!$('#mT').value.trim())return toast('Give it a name','err');
+ await api().add_manual({title:$('#mT').value,url:$('#mU').value,source:$('#mS').value,status:$('#mSt').value,email:$('#mE').value,notes:$('#mN').value,subject:pendingJob?.subject,body:pendingJob?.body});pendingJob=null;
+ $('#addX').click();toast('Added to your pipeline','okk');refresh();if($('#p-pipe').classList.contains('on'))renderPipe()};
+let pendingJob=null;
+
+/* FOLLOW-UPS */
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-dmsent],[data-dmcopy],[data-dmopen],[data-dmclose]');if(!b)return;
+ if(b.dataset.dmcopy!==undefined){api().copy(b.dataset.dmcopy);toast('Copied','okk')}
+ if(b.dataset.dmopen)api().open(b.dataset.dmopen);
+ if(b.dataset.dmsent){await api().dm_sent(b.dataset.dmsent);toast('Logged, next one is timed from now','okk');renderFu();refresh()}
+ if(b.dataset.dmclose){await api().set_status(b.dataset.dmclose,'no_answer');renderFu();refresh()}});
+async function renderFu(){const L=await getLeads(),DM=await api().dm_followups();$('#fuTest').classList.toggle('on',!!ST.settings.fu_test);
+ const T=!!ST.settings.fu_test,U=T?6e4:864e5,st=[1,2,2],now=Date.now();
+ const d=t=>{const x=new Date(t);return T?x.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):x.toLocaleDateString([],{day:'numeric',month:'short'})+(Math.abs(x-now)<2*864e5?' '+x.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'')};
+ const rows=[];
+ for(const l of L){const o=l.outreach||{},s=l.status;if(!['drafted','contacted','followup','replied','pitched','meeting','client','no_answer','bounced'].includes(s))continue;if(!o.thread_id&&!o.sent_at&&s!=='drafted')continue;
+  const f=o.followups||[],n=f.length,last=n?f[n-1]:o.sent_at,due=o.next_due?new Date(o.next_due):(last&&n<3?new Date(new Date(last).getTime()+st[n]*U-(T?0:72e5)):null);
+  let cls='',step='',act='';
+  if(s=='drafted'){cls='r-now';step='<span class="fc now">First email is in Gmail Drafts: send it</span>';act=`<button class="btn sm pri" data-fuopen="1">Open Drafts</button> <button class="btn sm ghost" data-funot="${l.channel_id}" title="You decided not to send it: back to New">Not sending</button>`}
+  else if(['replied','pitched','meeting','client'].includes(s)){cls='r-rep';step=`<span class="fc ok">${s=='replied'?'They replied: answer fast':s=='client'?'Client 🎉':'In talks'}</span>`;act=s=='replied'||s=='pitched'?`<button class="btn sm pri" data-rd="${l.channel_id}">Draft my reply</button> <button class="btn sm" data-kit="${l.channel_id}">Sample kit</button>`:''}
+  else if(s=='no_answer'||s=='bounced'){cls='r-done';step=`<span class="fc wait">${s=='bounced'?'Email bounced (bad address)':'No answer after 3 follow-ups'}</span>`}
+  else if(o.fu_ready!=null){cls='r-now';step=`<span class="fc now">Follow-up ${o.fu_ready+1} is in Gmail Drafts: send it</span>`;act=`<button class="btn sm pri" data-fuopen="1">Open Drafts</button>`}
+  else if(n>=3){cls='r-done';step='<span class="fc wait">All 3 sent, waiting for a reply</span>'}
+  else if(due&&due<=now){cls='r-now';step=`<span class="fc now">Follow-up ${n+1} due now</span>`;act=`<button class="btn sm pri" data-funow="${l.channel_id}">Make it now</button>`}
+  else{cls=due&&due-now<(T?6e4:864e5)?'r-soon':'';step=`<span class="fc ${cls?'soon':'wait'}">Follow-up ${n+1} on ${due?d(due):'?'}</span>`;act=`<button class="btn sm ghost" data-funow="${l.channel_id}" title="Don't wait: put the next follow-up in your Gmail Drafts now">Make it now</button>`}
+  const cell=i=>i<n?`<span class="fc ok">✓ ${d(f[i])}</span>`:(i==n&&o.fu_ready==i?'<span class="fc now">in Drafts</span>':(i==n&&due&&!['replied','pitched','no_answer','bounced','drafted'].includes(s)?`<span class="fc ${due<=now?'now':'wait'}">${due<=now?'due':d(due)}</span>`:'<span class="fc wait">–</span>'));
+  rows.push({cls,pri:{'r-now':0,'r-soon':1,'':2,'r-rep':3,'r-done':4}[cls],html:`<tr class="${cls}"><td><div style="display:flex;gap:9px;align-items:center"><div class="av" style="width:28px;height:28px;flex:none;background-image:url('${esc(l.photo)}')"></div><div style="min-width:0"><div class="nm" style="font-size:13px">${esc(l.title)}</div><div class="meta">${esc(l.email||'')}</div></div></div></td>
+   <td>${o.sent_at&&s!=='drafted'?`<span class="fc ok">✓ ${d(o.sent_at)}</span>`:'<span class="fc wait">not sent</span>'}</td><td>${cell(0)}</td><td>${cell(1)}</td><td>${cell(2)}</td><td>${step}</td><td style="text-align:right">${act}</td></tr>`})}
+ rows.sort((a,b)=>a.pri-b.pri);
+ const cN=rows.filter(r=>r.cls=='r-now').length,cR=rows.filter(r=>r.cls=='r-rep').length,cS=rows.filter(r=>r.cls=='r-soon').length;
+ $('#fuTodo').innerHTML=rows.length?`<div class="todo"><div class="${cN?'hot':''}"><b>${cN}</b>to send now (in Gmail Drafts or due)</div><div><b>${cS}</b>coming up ${T?'in the next minute':'in the next 24h'}</div><div><b>${cR}</b>replied: answer them</div></div>`:'';
+ const h=rows.length?`<table class="fut"><tr><th>Person</th><th>First email</th><th>Nudge 1</th><th>Nudge 2</th><th>Nudge 3</th><th>What to do</th><th></th></tr>${rows.map(r=>r.html).join('')}</table>`:'';
+ const dmDue=DM.filter(d=>d.due&&!d.done),dmDone=DM.filter(d=>d.done),dmWait=DM.filter(d=>!d.due&&!d.done);
+ const dm=(dmDue.length?`<div class="sec-t">Follow up yourself today (Discord, X, job sites) · ${dmDue.length}</div><div class="rows">${dmDue.map(d=>`<div class="fu" style="align-items:flex-start"><div style="flex:1;min-width:0"><div class="nm">${esc(d.title)} <span class="tag n">${esc(d.source)}</span> <span class="tag acc">FUP${d.n+1}</span></div>
+  <div class="small t2" style="margin-top:4px;white-space:pre-wrap">${esc(d.text)}</div></div><div style="display:flex;gap:6px;flex:none">${d.url?`<button class="btn sm" data-dmopen="${esc(d.url)}">Open ↗</button>`:''}<button class="btn sm" data-dmcopy="${esc(d.text)}">Copy</button><button class="btn sm pri" data-dmsent="${d.channel_id}">I sent it</button></div></div>`).join('')}</div>`:'')+
+  (dmWait.length?`<div class="sec-t">DM follow-ups coming up · ${dmWait.length}</div><div class="rows">${dmWait.map(d=>`<div class="fu"><div style="flex:1" class="nm">${esc(d.title)} <span class="tag n">${esc(d.source)}</span></div><span class="small muted">FUP${d.n+1} in ${d.due_in_h>=24?Math.round(d.due_in_h/24)+' day'+(Math.round(d.due_in_h/24)>1?'s':''):d.due_in_h+'h'}</span></div>`).join('')}</div>`:'')+
+  (dmDone.length?`<div class="sec-t">3 DM follow-ups sent, still quiet · ${dmDone.length}</div><div class="rows">${dmDone.map(d=>`<div class="fu"><div style="flex:1" class="nm">${esc(d.title)}</div><button class="btn sm" data-dmclose="${d.channel_id}">Mark No answer</button></div>`).join('')}</div>`:'');
+ $('#fuout').innerHTML=(dm+h)||'<div class="card empty"><b>No outreach yet</b>Open a lead, press Open in Gmail and send it. It shows up here.</div>';
+ $$('#fuout [data-fuopen]').forEach(b=>b.onclick=()=>api().open_drafts());
+ $$('#fuout [data-rd]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.innerHTML='<span class="spin"></span>';const r=await api().reply_draft(b.dataset.rd);b.disabled=false;b.textContent='Draft my reply';toast(r.error||`Reply is in your Gmail Drafts (opened)`,r.error?'err':'okk')});
+ $$('#fuout [data-kit]').forEach(b=>b.onclick=async()=>{await api().sample_kit(b.dataset.kit);toast('Getting the best ~90 seconds of their video, the folder opens when ready','okk')});
+ $$('#fuout [data-funot]').forEach(b=>b.onclick=async()=>{await api().set_status(b.dataset.funot,'new');toast('Moved back to New','okk');renderFu();fuBadge()});
+ $$('#fuout [data-funow]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.innerHTML='<span class="spin"></span>';const r=await api().followup_now(b.dataset.funow);
+  if(r.error){toast(r.error,'err')}else if(r.followups){toast('Follow-up is in your Gmail Drafts (opened). Press Send there','okk')}else{Object.values(r.why||{}).forEach(m=>toast(m));(r.errors||[]).forEach(e=>toast(e,'err'))}renderFu()})}
+$('#fuTest').onclick=async()=>{const on=!$('#fuTest').classList.contains('on');await api().set_fu_test(on);ST.settings.fu_test=on;toast(on?'Test mode on: 1 day = 1 minute. Turn it off before real outreach':'Test mode off: real timing (days)','okk');renderFu()};
+setInterval(()=>{if($('#p-fu').classList.contains('on'))renderFu()},30000);
+let _fcT=0;window.addEventListener('focus',async()=>{if(Date.now()-_fcT<10000)return;_fcT=Date.now();try{const r=await api().sync_gmail();if(r&&!r.busy)SR.on('synced',r)}catch(e){}});
+function isDue(l){const o=l.outreach||{},n=(o.followups||[]).length;if(!o.sent_at||n>=3)return false;const last=new Date(n?o.followups[n-1]:o.sent_at);return Date.now()-last>=([1,2,2][n]*864e5-72e5)}
+$('#openDrafts')&&($('#openDrafts').onclick=()=>api().open_drafts());
+$('#sync').onclick=async()=>{const b=$('#sync');b.disabled=true;b.innerHTML='<span class="spin"></span>Checking…';const r=await api().sync_gmail();b.disabled=false;b.innerHTML='Refresh';
+ if(r.busy)return toast('Already checking, give it a moment');const parts=[r.bounced&&`${r.bounced} bounced (bad address)`,r.linked&&`${r.linked} email${r.linked>1?'s':''} you sent yourself linked`,r.sent&&`${r.sent} marked sent`,r.replied&&`${r.replied} replied 🎉`,r.followups&&`${r.followups} follow-up draft${r.followups>1?'s':''} ready in Gmail`,r.sheet&&`${r.sheet} updated from your sheet`].filter(Boolean);
+ toast(parts.length?parts.join(' · '):'All up to date','okk');if(r.errors.length)toast(r.errors[0],'err');
+ /* say exactly why a lead didn't get a follow-up yet (e.g. "due in 3h", "still in Drafts") */
+ Object.entries(r.why||{}).slice(0,3).forEach(([t,m])=>toast(t+': '+m));
+ renderFu();refresh()};
+
+/* JOBS */
+$('#jclear').onclick=()=>{$('#job').value='';$('#jobout').innerHTML='<div class="card empty"><b>Nothing checked yet</b>Results show up here.</div>'};
+$('#tri').onclick=async()=>{if(!$('#job').value.trim())return toast('Paste a job post first','err');const b=$('#tri');b.disabled=true;b.innerHTML='<span class="spin"></span>Checking…';
+ const d=await api().triage($('#job').value,'auto');b.disabled=false;b.textContent='Check and write reply';const c=d.contacts||{};
+ const col={APPLY:'var(--ok)',MAYBE:'var(--warn)',SKIP:'var(--bad)'}[d.verdict]||'var(--t2)';
+ const links=[...(c.emails||[]).map(e=>`<span class="tag n">${esc(e)}</span>`),...(c.discord||[]).map(e=>`<span class="tag n">${esc(e)}</span>`),...(c.youtube||[]).map(u=>`<button class="btn sm" data-u="https://${esc(u)}">${esc(u)} ↗</button>`)].join(' ');
+ $('#jobout').innerHTML=`<div class="card"><div class="verdict" style="color:${col}">${esc(d.verdict)}</div><div class="t2" style="margin-top:6px">${esc(d.why)}</div>
+  ${d.rate?`<div class="small muted" style="margin-top:8px">Rate: ${esc(d.rate)}</div>`:''}
+  <div class="sec-t">Where to reply</div><div class="small t2">${esc(d.contact||'')} </div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${links||'<span class="small muted">No contact found in the post. If it links a YouTube channel, open its About page and solve the captcha for the email.</span>'}</div>
+  ${d.body?`<div class="sec-t">Your reply</div>${d.subject?`<input class="in" id="jsu" style="font-weight:600;margin-bottom:8px" value="${esc(d.subject)}">`:''}<textarea class="in" id="jbo" rows="12">${esc(d.body)}</textarea>
+  <div class="checks">${(d.issues||[]).length?d.issues.map(x=>`<span class="tag warn">${esc(x)}</span>`).join(''):'<span class="tag ok">✓ Follows your master doc</span>'}</div>
+  <div style="margin-top:12px;display:flex;gap:8px"><button class="btn pri" id="jcp">Copy reply</button><button class="btn" id="jtrack">I sent it, track it</button></div>`:''}</div>`;
+ $$('#jobout [data-u]').forEach(x=>x.onclick=()=>api().open(x.dataset.u.replace(/\/$/,'')+'/about'));
+ if($('#jtrack'))$('#jtrack').onclick=()=>{pendingJob={subject:$('#jsu')?$('#jsu').value:'',body:$('#jbo').value};
+  const first=$('#job').value.split('\n').map(x=>x.trim()).find(Boolean)||'Job post';openAdd({title:first.slice(0,80),source:'YT Jobs',email:(c.emails||[])[0]||'',url:(c.youtube||[])[0]?'https://'+c.youtube[0]:''})};
+ if($('#jcp'))$('#jcp').onclick=()=>{api().copy(($('#jsu')?$('#jsu').value+'\n\n':'')+$('#jbo').value);toast('Copied','okk')}};
+
+/* SETUP */
+const ok=b=>b?`<div class="st ok">${I.check}</div>`:'';
+async function renderSetup(){SS=await api().setup_status();const s=SS,c=s.claude||{};let i=0;const n=()=>++i;
+ const card=(done,title,desc,act,extra='')=>`<div class="card"><div class="sc">${done?ok(1):`<div class="st">${n()}</div>`}<div><b style="font-weight:600">${title}</b><div class="small t2">${desc}</div></div><div>${act}</div></div>${extra}</div>`;
+ i=0;let h='';
+ h+=card(c.installed&&c.ok,'Claude for writing emails',c.installed?`Installed${c.version?' ('+esc(c.version)+')':''}. Uses your Claude Pro login with <b>Sonnet</b> (not Opus), so it's light on your limits. If emails fall back to the template, click Log in.`:'Free with your Claude Pro plan. Opens an installer window, then asks you to log in once.',
+  c.installed?'<button class="btn" id="sClaude">Log in again</button>':'<button class="btn pri" id="sClaude">Install Claude</button>');
+ h+=card(s.selfie&&s.monitor||(ST.settings.img_mode||'frame')=='frame','Your selfie (optional)',s.selfie?(s.monitor?'Done. Pick "Selfie with their video" on a lead to use it.':'Now click the 4 corners of the monitor screen in the photo below: top-left, top-right, bottom-right, bottom-left.'):'Optional. By default emails use a clean frame from their video. Add a desk photo only if you also want the selfie version (their video placed on your monitor).',
+  `<button class="btn${s.selfie?'':' pri'}" id="sPick">${s.selfie?'Change photo':'Choose photo'}</button>`,
+  s.selfie?`<div style="margin:10px 0 0 50px;display:flex;gap:8px;align-items:center"><button class="btn pri sm" id="sAdjust">Adjust corners and look</button><span class="small t2">${s.monitor?'✓ Corners saved':'Drag the 4 dots onto your screen\'s corners'}</span></div>`:'');
+ h+=card(!!s.gmail_account,'Your outreach Gmail','Open in Gmail always opens in this account, even if your browser\'s default Google account is a different one (school, work).','',`<div style="margin:10px 0 0 50px;display:flex;gap:8px"><input class="in" id="sGAcct" placeholder="you@gmail.com" value="${esc(s.gmail_account||'')}" style="max-width:320px"><button class="btn sm" id="sGAcctSave">Save</button></div>`);
+ h+=card(true,'Email signature','Added to the bottom of every first email. Gmail only lets apps read your <i>default</i> signature, so to use a different one: open Gmail Settings, select your 2nd signature\'s text and picture, copy it, and paste it below.','',`<div style="margin:10px 0 0 50px"><div id="sSig" contenteditable="true" style="min-height:70px;max-width:560px;background:#fff;color:#222;border-radius:8px;padding:10px;font:14px Arial,sans-serif"></div>
+  <div style="display:flex;gap:8px;margin-top:8px"><button class="btn sm" id="sSigSave">Save signature</button><button class="btn sm ghost" id="sSigDef">Use my Gmail default</button><button class="btn sm ghost" id="sSigNone">No signature</button><span class="small t2" id="sSigInfo"></span></div></div>`);
+ h+=card(s.gmail_token,'Gmail drafts',s.gmail_token?'Connected. Drafts go straight into your Gmail, nothing sends by itself.':(s.gmail_client?'Client file added. Click Connect and sign in with Google.':'One-time Google setup, about 5 minutes:'),
+  s.gmail_token?'':s.gmail_client?'<button class="btn pri" id="sGConn">Connect Gmail</button>':'<button class="btn" id="sGFile">Add client file</button>',
+  !s.gmail_client?`<ol class="steps" style="margin-left:50px"><li>Open <a href="#" class="linkb" data-u="https://console.cloud.google.com/projectcreate">Google Cloud</a> and create a project (any name).</li><li>Enable the <a href="#" class="linkb" data-u="https://console.cloud.google.com/apis/library/gmail.googleapis.com">Gmail API</a>.</li><li>On the <a href="#" class="linkb" data-u="https://console.cloud.google.com/auth/audience">OAuth consent screen</a> pick External and add your Gmail as a test user.</li><li>Under <a href="#" class="linkb" data-u="https://console.cloud.google.com/apis/credentials">Credentials</a> create an OAuth client ID, type Desktop app, then download the JSON.</li><li>Click Add client file and pick that JSON.</li></ol>`:'');
+ h+=card(s.ollama,'Ollama (optional backup)',s.ollama?'Running. Used if Claude is unavailable.':'Free local AI used only if Claude fails. Skip it if Claude works.','<button class="btn ghost" data-u="https://ollama.com/download">Get Ollama ↗</button>');
+ const D=await api().docs();
+ h+=card(true,'Your master docs','Claude reads these on every email and job reply: your master prompt (rules, exclusions, voice), the outreach sections of your Ritch master doc, and your notes below (highest priority). Replace a doc whenever you update it.',
+  '',`<div style="margin:12px 0 0 50px;display:flex;flex-direction:column;gap:8px">${['master_prompt.txt','ritch_master_doc.txt'].map(n=>`<div style="display:flex;gap:10px;align-items:center"><b style="font-weight:600;min-width:150px">${D[n].label}</b><span class="small t2" style="flex:1">${D[n].words.toLocaleString()} words · ${D[n].custom?'your copy, updated '+D[n].updated:'built-in copy'}</span><button class="btn sm" data-doc="${n}">Replace…</button></div>`).join('')}
+  <div class="field" style="margin-top:6px"><span>Your notes for Claude (overrides the docs)</span><textarea class="in" id="sNotes" rows="4">${esc(D.notes)}</textarea></div><div><button class="btn sm" id="sNotesSave">Save notes</button></div></div>`);
+ h+=card(false,'Google Sheet','Every lead lives in a clean "SwipeReach Studio" tab of your leads spreadsheet, synced both ways a few seconds after any change. Edit Status, Email, First name or Notes in the sheet and the app picks it up. It is also your backup: if the app ever loses its leads, it restores them from this tab. Your old V2 tab is left as is.','<div style="display:flex;gap:6px"><button class="btn" id="sSheet">Test + sync now</button><button class="btn ghost" id="sRestore" title="Bring back any leads that are in the sheet tab but missing from the app">Restore from sheet</button></div>','<div id="sSheetOut" style="margin:10px 0 0 50px;display:flex;flex-direction:column;gap:4px"></div>');
+ const G=await api().quota_grant();
+ const gx=G&&!G.error?`<div style="margin:12px 0 0 50px;display:flex;flex-direction:column;gap:6px"><div><b style="font-weight:600">Quota grant</b> <span class="small t2">approved ${esc(G.start)} · ends <b>${esc(G.end)}</b> · ${G.days_left>0?G.days_left+' days left':'ended'}</span></div>
+  <div class="small ${G.apply_now?'':'t2'}" style="${G.apply_now?'color:var(--warn)':''}">${G.apply_now?'Time to reapply: submit the Audit and Quota Extension Form now (reviews can take weeks to months).':'Reapply from '+esc(G.apply_from)+' (about 3 months before it ends). The app will remind you.'}</div>
+  <div class="small t2">${G.days?`Your real usage so far: about ${G.avg_units.toLocaleString()} units and ${G.avg_searches} searches a day, peak ${G.peak_units.toLocaleString()} (${G.days} days tracked). Quote these in the renewal form.`:'Tracking your daily usage now, so the renewal form can quote real numbers.'}</div>
+  <div style="display:flex;gap:8px;align-items:center"><span class="small t2">Approval date</span><input class="in" id="gStart" value="${esc(G.start)}" style="width:130px"><button class="btn sm" id="gSave">Save</button></div></div>`:'';
+ h+=card(true,'YouTube',"Uses the API keys from your old SwipeReach, with the same quota rotation.",'',gx);
+ const W=await api().warmup(),N=await api().ntfy(false),LI=await api().lists();
+ h+=card(W.on,'Warm-up for a new sending email',W.on?`Week ${W.week}: up to <b>${W.limit}</b> cold emails a day (${W.sent_today} sent today)${W.next?`, rising to ${W.next.limit} in ${W.next.in_days} days`:''}. ${esc(W.tip)} The app warns you before you go over.`:'Using a brand-new email? Turn this on and the app keeps your daily cold emails safe: 0 in week 1, then 5, 10, 15, 20, 25 a day.',
+  `<div style="display:flex;gap:6px;align-items:center"><input class="in" id="wStart" value="${esc(W.start||new Date().toISOString().slice(0,10))}" style="width:120px" title="The day you started using the new email"><button class="btn sm" id="wOn">${W.on?'Save':'Turn on'}</button>${W.on?'<button class="btn sm ghost" id="wOff">Turn off</button>':''}</div>`);
+ h+=card(!!N.topic,'Phone alert when someone replies',N.topic?`On. In the free <b>ntfy</b> app (App Store / Google Play), subscribe to <b>${esc(N.topic)}</b>. You'll get: someone replied, follow-ups waiting (once a day), long searches finished, and a Monday summary.`:'Get a notification on your phone the moment someone replies, so you can answer fast. Uses the free ntfy app, no account.',
+  N.topic?'<div style="display:flex;gap:6px"><button class="btn sm" id="nTest">Send a test</button><button class="btn sm ghost" id="nOff">Turn off</button></div>':'<button class="btn sm" id="nOn">Turn on</button>');
+ h+=card(!!(LI.samples||LI.testimonials),'Samples & testimonials','One per line. The email gets a button to add the best match for their niche.','',`<div style="margin:12px 0 0 50px;display:grid;gap:8px"><div class="field"><span>Samples: <i>niche words | link</i></span><textarea class="in" id="lSamples" rows="3" placeholder="gaming, game, lore | https://youtu.be/...&#10;cooking, food, recipe | https://youtu.be/...">${esc(LI.samples)}</textarea></div><div class="field"><span>Testimonials: <i>niche words | what they said | who</i></span><textarea class="in" id="lTesti" rows="3" placeholder="golf, coaching | Ritch made my videos so much tighter | Coach Mike">${esc(LI.testimonials)}</textarea></div><div><button class="btn sm" id="lSave">Save</button></div></div>`);
+ $('#setupList').innerHTML=h;
+ $$('#setupList [data-u]').forEach(a=>a.onclick=e=>{e.preventDefault();api().open(a.dataset.u)});
+ $$('[data-doc]').forEach(b=>b.onclick=async()=>{const r=await api().replace_doc(b.dataset.doc);if(!r)return;if(r.error)return toast(r.error,'err');toast('Updated, '+r.words.toLocaleString()+' words. Claude uses it from now on.','okk');renderSetup()});
+ $('#wOn')&&($('#wOn').onclick=async()=>{const r=await api().set_warmup($('#wStart').value.trim());if(r.error)return toast(r.error,'err');toast(`Warm-up on: ${r.limit} cold emails today`,'okk');warmPill();renderSetup()});
+ $('#wOff')&&($('#wOff').onclick=async()=>{await api().set_warmup('');warmPill();renderSetup()});
+ $('#nOn')&&($('#nOn').onclick=async()=>{await api().ntfy(true);renderSetup()});$('#nOff')&&($('#nOff').onclick=async()=>{await api().ntfy_off();renderSetup()});
+ $('#nTest')&&($('#nTest').onclick=async()=>{const r=await api().ntfy_test();toast(r.ok?'Sent. Check your phone (subscribe to the topic in the ntfy app first)':'Could not send, check your internet','okk')});
+ $('#lSave')&&($('#lSave').onclick=async()=>{await api().save_lists($('#lSamples').value,$('#lTesti').value);toast('Saved','okk')});
+ $('#gSave')&&($('#gSave').onclick=async()=>{const r=await api().set_quota_grant($('#gStart').value.trim(),6);if(r.error)return toast(r.error,'err');toast('Saved','okk');renderSetup()});
+ $('#sNotesSave').onclick=async()=>{await api().save_notes($('#sNotes').value);toast('Notes saved','okk')};
+ $('#sRestore').onclick=async()=>{const r=await api().restore_sheet();if(r.error)return toast(r.error,'err');toast(r.restored?`Restored ${r.restored} leads from your sheet`:'Nothing missing, the app already has every lead in the sheet','okk');refresh()};
+ $('#sSheet').onclick=async()=>{const b=$('#sSheet');b.disabled=true;b.innerHTML='<span class="spin"></span>Checking…';const r=await api().sheet_test();b.disabled=false;b.textContent='Test again';
+  $('#sSheetOut').innerHTML=(r.steps||[]).map(x=>`<div class="small" style="color:${x.ok?'var(--ok)':'var(--warn)'}">${x.ok?'✓':'!'} <span class="t2">${esc(x.msg)}</span></div>`).join('')};
+ if($('#sClaude'))$('#sClaude').onclick=async()=>{const r=await api().install_claude();if(r&&r.error)return toast(r.error,'err');toast('A window opened. Follow it, log in, then come back and click Setup again.')};
+ $('#sGAcctSave').onclick=async()=>{const v=$('#sGAcct').value.trim();if(v&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))return toast('That doesn\'t look like an email address','err');await api().set_gmail_account(v);toast('Saved: Gmail will open in '+(v||'your default account'),'okk');renderSetup()};
+ api().get_signature().then(g=>{$('#sSig').innerHTML=g.html==='-'?'':(g.html||'');$('#sSigInfo').textContent=g.custom?(g.html==='-'?'No signature':'Using the one you pasted'):'Using your Gmail default'});
+ $('#sSigSave').onclick=async()=>{const h=$('#sSig').innerHTML.trim();if(!h)return toast('Paste your signature into the white box first','err');await api().set_signature(h);toast('Signature saved','okk');renderSetup()};
+ $('#sSigDef').onclick=async()=>{await api().set_signature('');toast('Using your Gmail default signature','okk');renderSetup()};
+ $('#sSigNone').onclick=async()=>{await api().set_signature('-');toast('No signature','okk');renderSetup()};
+ $('#sPick').onclick=async()=>{const r=await api().selfie_setup();if(r){await renderSetup();openSelfie(null)}};
+ if($('#sGFile'))$('#sGFile').onclick=async()=>{const r=await api().import_gmail_client();if(r&&r.error)toast(r.error,'err');renderSetup()};
+ if($('#sGConn'))$('#sGConn').onclick=async()=>{toast('Opening Google sign-in in your browser…');const r=await api().connect_gmail();if(r.error)toast(r.error,'err');else toast('Gmail connected','okk');renderSetup();aiPill()};
+ if(s.selfie)$('#sAdjust').onclick=()=>openSelfie(null);
+ $('#bdSetup').style.display=(c.installed&&s.gmail_token)?'none':''}
+let pts=[];
+function drawPts(){const i=$('#sImg'),sv=$('#sSvg');if(!i||!i.naturalWidth)return;const k=i.clientWidth/i.naturalWidth;sv.setAttribute('viewBox',`0 0 ${i.clientWidth} ${i.clientHeight}`);
+ sv.innerHTML=(pts.length==4?`<polygon points="${pts.map(p=>p[0]*k+','+p[1]*k).join(' ')}" fill="rgba(124,108,255,.22)" stroke="#9a8dff" stroke-width="2"/>`:pts.length>1?`<polyline points="${pts.map(p=>p[0]*k+','+p[1]*k).join(' ')}" fill="none" stroke="#9a8dff" stroke-width="2" stroke-dasharray="4 4"/>`:'')+pts.map((p,j)=>`<circle cx="${p[0]*k}" cy="${p[1]*k}" r="6" fill="#7c6cff" stroke="#fff" stroke-width="2"/>`).join('');
+ const names=['top-left','top-right','bottom-right','bottom-left'];$('#sCn').textContent=pts.length==4?'✓ Corners saved':`Click the screen's ${names[pts.length]} corner`}
+async function clickPt(e){if(pts.length>=4)return;const i=$('#sImg'),r=i.getBoundingClientRect(),k=i.naturalWidth/i.clientWidth;pts.push([Math.round((e.clientX-r.left)*k),Math.round((e.clientY-r.top)*k)]);drawPts();
+ if(pts.length==4){await api().set_monitor(pts);toast('Monitor corners saved','okk');renderSetup()}}
+
+/* shared */
+let pt;function savePrefs(){clearTimeout(pt);pt=setTimeout(()=>api().save_prefs({goal:(ST.settings.ui||{}).goal,style:$('#dStyle').value,styleV2:1,keep:$('#keep').classList.contains('on'),mode,modes:[...modes],growing,selBy:{business:[...selBy.business],creators:[...selBy.creators]},custom:$('#custom').value,budget:want,budgetAll:wantAll,lst,lsort:$('#lsort').value,mailOnly,filters:{cr_max_subs:+$('#cr_max_subs').value||undefined,cr_min_subs:+$('#cr_min_subs').value||undefined,cr_min_views:+$('#cr_min_views').value||undefined,cr_need_money:$('#crMoney').classList.contains('on'),min_subs:+$('#min_subs').value||undefined,max_subs:+$('#max_subs').value||undefined,min_tier:$('#min_tier').value,sheet_push:$('#sheet_push').value=='1',max_searches:+$('#budget').value}}),400)}
+function loadPrefs(p){if(!p)return;{const ms=(p.modes||[p.mode]).filter(m=>m&&ST.groups[m]);if(ms.length)modes=new Set(ms)}
+ growing=!!p.growing;if(p.style)$('#dStyle').value=p.styleV2?p.style:'best';$('#keep').classList.toggle('on',!!p.keep);$('#grow').classList.toggle('on',growing);$('#custom').value=p.custom||'';if(p.selBy){selBy={business:new Set(p.selBy.business||[]),creators:new Set(p.selBy.creators||[])}}else if(p.sel){selBy[mode]=new Set(p.sel)}syncMode();if(p.budget)want=p.budget;
+ if(p.lst){lst=p.lst;$$('#lst button').forEach(x=>x.classList.toggle('on',x.dataset.v==lst))}if(p.lsort)$('#lsort').value=p.lsort;mailOnly=!!p.mailOnly;$('#lmail').classList.toggle('pri',mailOnly)}
+document.addEventListener('click',e=>{if(e.target.closest('.wc,#grow,.chip,.linkb,#lst button,#lmail'))savePrefs()},true);
+document.addEventListener('change',e=>{if(e.target.closest('#custom,#budget,#lsort,#min_subs,#max_subs,#cr_min_subs,#cr_max_subs,#cr_min_views,#min_tier,#sheet_push'))savePrefs()},true);
+async function refresh(){ST=await api().state();const c=ST.counts||{};$('#bdLeads').textContent=c.new||0;
+ fuBadge()}
+async function aiPill(){const s=await api().setup_status();SS=s;const c=s.claude||{};setCap(s.capacity);
+ $('#aiPill').innerHTML=c.installed&&c.ok?'<span class="dot ok"></span><span>Claude Sonnet ready</span>':s.ollama?'<span class="dot warn"></span><span>Ollama only</span>':'<span class="dot warn"></span><span>AI not set up · <a href="#" class="linkb" id="aiSet">Setup</a></span>';
+ if($('#aiSet'))$('#aiSet').onclick=e=>{e.preventDefault();go('setup')};
+ $('#bdSetup').style.display=(c.installed&&s.gmail_token)?'none':''}
+let booted=false;async function boot(){if(booted)return;booted=true;await refresh();const S=ST.settings;$('#min_subs').value=S.min_subs;$('#max_subs').value=S.max_subs;$('#min_tier').value=S.min_tier||'MEDIUM';$('#cr_min_subs').value=S.cr_min_subs;$('#cr_max_subs').value=S.cr_max_subs;$('#cr_min_views').value=S.cr_min_views;$('#crMoney').classList.toggle('on',S.cr_need_money!==false);$('#sheet_push').value=S.sheet_push===false?'0':'1';
+ want=S.max_searches||12;wantAll=!!(S.ui&&S.ui.budgetAll);loadPrefs(S.ui);modeUI();goalUI();if(S.fu_test)setTimeout(()=>toast('Follow-up TEST MODE is on (1 day = 1 minute). Turn it off on the Follow-ups page before real outreach','err'),800);budget();renderGroups();aiPill();loadQ();
+ api().pull_sheet().then(r=>{if(r&&r.changed){toast(r.changed+' status'+(r.changed>1?'es':'')+' updated from your sheet','okk');refresh()}})}
+window.addEventListener('pywebviewready',boot);if(window.pywebview&&window.pywebview.api&&window.pywebview.api.state)boot();
+window.addEventListener('resize',()=>drawPts());
+
+/* daily goal: Malice's rule one is volume + consistency, so keep today's number in sight */
+function sentDay(l){const o=l.outreach||{};const t=o.sent_at||((l.history||[]).find(h=>h.status=='contacted')||{}).t;return t?new Date(t.endsWith('Z')||/[+-]\d\d:?\d\d$/.test(t)?t:t+'Z').toDateString():''}
+async function goalUI(){try{const L=await getLeads(),today=new Date().toDateString(),n=L.filter(l=>sentDay(l)==today).length,g=+((ST.settings.ui||{}).goal||30);
+ let streak=0;for(let d=1;d<60;d++){const day=new Date(Date.now()-d*864e5).toDateString();if(L.some(l=>sentDay(l)==day))streak++;else break}
+ if(n)streak++;
+ $('#goalPill').innerHTML=`<span class="dot ${n>=g?'ok':'warn'}"></span><span>Sent today: ${n} / ${g}${streak>1?` · ${streak} day streak`:''}</span>`}catch(e){}}
+$('#goalPill').onclick=e=>{if(e.target.tagName=='INPUT')return;const P=$('#goalPill');P.innerHTML='<span>Daily goal</span><input type="number" min="1" value="'+((ST.settings.ui||{}).goal||30)+'" style="width:52px;background:transparent;border:0;color:inherit;font:inherit">';const i=P.querySelector('input');i.focus();i.select();
+ const done=()=>{const g=+i.value;if(g>0){ST.settings.ui=Object.assign(ST.settings.ui||{},{goal:g});savePrefs()}goalUI()};i.onblur=done;i.onkeydown=k=>{if(k.key=='Enter')i.blur()}};
+setTimeout(grantCheck,8000);setTimeout(brainUI,3000);setInterval(goalUI,60000);setInterval(()=>{try{loadQ()}catch(e){}},300000);   /* quota pill stays current (and rolls over at the daily reset) */
+
+/* deleting leads: tick rows (or Select all shown) then Delete. Undo is in the toast for a few seconds */
+const PICK=new Set();
+function pickBar(){const n=PICK.size;$('#pickBar').style.display=n?'flex':'none';$('#pickN').textContent=n+' selected';$('#rows').classList.toggle('picking',n>0)}
+$('#pickAll').onclick=()=>{view.forEach(l=>PICK.add(l.channel_id));$$('#rows .pick').forEach(c=>c.checked=true);pickBar()};
+$('#pickClr').onclick=()=>{PICK.clear();$$('#rows .pick').forEach(c=>c.checked=false);pickBar()};
+$('#pickDel').onclick=async()=>{const ids=[...PICK];if(!ids.length)return;const r=await api().delete(ids);PICK.clear();if(cur&&ids.includes(cur.channel_id))closeD();await loadLeads();refresh();undoToast(r)};
+function undoToast(r){const n=(r&&r.deleted)||0;if(!n)return;const t=document.createElement('div');t.className='toast';t.innerHTML=`Deleted ${n} lead${n>1?'s':''} <button class="btn sm" style="margin-left:6px">Undo</button>`;
+ t.querySelector('button').onclick=async()=>{t.remove();await api().undo_delete(r.leads);await loadLeads();refresh();toast('Restored','okk')};$('#toasts').append(t);setTimeout(()=>t.remove(),8000)}
+
+/* sidebar badge on Follow-ups = how many red rows (things to do now) */
+async function fuBadge(){try{const L=await getLeads(),T=!!ST.settings.fu_test,U=T?6e4:864e5,st=[1,2,2],now=Date.now();let n=0;
+ for(const l of L){const o=l.outreach||{},s=l.status,f=o.followups||[];if(s=='drafted'&&o.thread_id){n++;continue}if(!['contacted','followup'].includes(s))continue;
+  if(o.fu_ready!=null){n++;continue}const last=f.length?f[f.length-1]:o.sent_at;if(!last||f.length>=3)continue;const due=o.next_due?new Date(o.next_due):new Date(new Date(last).getTime()+st[f.length]*U-(T?0:72e5));if(due<=now)n++}
+ const b=$('#bdDue');b.style.display=n?'':'none';b.textContent=n;b.classList.toggle('hot',!!n)}catch(e){}}
+setInterval(fuBadge,60000);setTimeout(fuBadge,1500);
+
+/* ================= boosters ================= */
+let TODAY=null;
+async function loadToday(){TODAY=await api().today();renderLeads()}
+function todayHead(){const w=TODAY.warmup||{};const n=TODAY.ids.length;
+ return `<div class="card" style="margin-bottom:10px;padding:12px 14px"><b>${n?`Your ${n} best leads to email today`:'Nothing to send today'}</b><div class="small t2">${w.on?`Warm-up week ${w.week}: ${w.sent_today} of ${w.limit} sent today.`:'Best leads with a working email. People whose editor just left, or who are falling behind, come first.'} ${n?'':(w.on&&w.left===0?'You hit today\'s warm-up limit, more tomorrow.':'Run Find clients or Find more emails.')}</div></div>`}
+function sigOk(l){const v=$('#lsig').value;if(!v)return true;const s=(l.signals||[]).map(x=>x[0]),r=(l.reasons||[]).join(' ');
+ return v=='growing'?(l.growth_x||0)>=1.6:v=='pays_editor'?(s.includes('pays_editor')||/credits an editor/.test(r)):s.includes(v)}
+$('#lsig').onchange=renderLeads;
+$('#lst').addEventListener('click',e=>{if(e.target.dataset.v=='today'){TODAY=null}},true);
+$('#lfindem').onclick=async()=>{const r=await api().find_emails();if(r.busy)return toast('Already looking for emails…');const b=$('#lfindem');b.disabled=true;b.innerHTML='<span class="spin"></span>Looking…';toast('Looking for missing emails on link-in-bio pages and websites. Keep working, it runs in the background.','okk')};
+$('#lookBtn').onclick=async()=>{const r=await api().lookalikes();if(r.error)return toast(r.error,'err');$('#findForm').style.display='none';$('#prog').classList.add('on');startProg();$('#pTitle').textContent='Finding lookalikes of your best leads'};
+async function boostLead(l){$('#dEmailChk').innerHTML='';$('#dSpam').innerHTML='';$('#dExtras').innerHTML='';
+ $('#dReply').style.display=$('#dKit').style.display=['replied','pitched','meeting','client'].includes(l.status)?'':'none';$('#dSched').style.display=['new','drafted','skip'].includes(l.status||'new')?'':'none';
+ const x=await api().extras(l.channel_id);if(cur!==l)return;
+ const c=x.check;$('#dEmailChk').innerHTML=!l.email?'':!c?'':c.ok===true&&c.agency?`<span style="color:var(--warn)">! ${esc(c.why)}. Look for their own email if you can.</span>`:c.ok===true?'<span style="color:var(--ok)">✓ Email looks real</span>':c.ok===false?`<span style="color:var(--bad)">! ${esc(c.why)}</span>${c.fix?` <a href="#" class="linkb" id="dFix">use ${esc(c.fix)}</a>`:''}`:'<span class="muted">Email not checked yet</span>';
+ if($('#dFix'))$('#dFix').onclick=e=>{e.preventDefault();$('#dEmail').value=c.fix;saveCur();boostLead(cur)};
+ if(x.price)$('#dStats').insertAdjacentHTML('beforeend',`<div class="stat" title="${esc(x.price.why)}"><span>Suggested rate</span><b>${esc(x.price.text.replace(' per 10-20 min video',''))}</b></div>`);
+ const ex=[];if(x.sample)ex.push(`<button class="btn sm" id="dAddSample" title="${esc(x.sample.url)}">+ Sample link (${esc(x.sample.label.split(',')[0])})</button>`);if(x.proof)ex.push('<button class="btn sm" id="dAddProof">+ Testimonial line</button>');
+ if(x.scheduled)ex.push(`<span class="tag ok">Sends ${esc(new Date(x.scheduled.at).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'}))} your time</span> <a href="#" class="linkb" id="dUnsched">cancel</a>`);
+ $('#dExtras').innerHTML=ex.join('');
+ const ins=t=>{const b=$('#dBody').value,i=b.lastIndexOf('\n\nIf you');$('#dBody').value=i>0?b.slice(0,i)+'\n\n'+t+b.slice(i):b+'\n\n'+t;spamUI()};
+ if($('#dAddSample'))$('#dAddSample').onclick=()=>ins(x.sample.line);if($('#dAddProof'))$('#dAddProof').onclick=()=>ins(x.proof.line);
+ if($('#dUnsched'))$('#dUnsched').onclick=async e=>{e.preventDefault();await api().unschedule(l.channel_id);toast('Cancelled: it stays in your Gmail Drafts','okk');boostLead(l)};
+ spamUI()}
+let spT;async function spamUI(){clearTimeout(spT);spT=setTimeout(async()=>{if(!cur||!$('#dBody').value.trim()){$('#dSpam').innerHTML='';return}
+ const r=await api().spam_check($('#dSubj').value,$('#dBody').value,$('#dAttach').checked);
+ $('#dSpam').innerHTML=r.level=='good'?'<span class="tag ok">✓ Spam check: clean</span>':`<span class="tag ${r.level=='risky'?'bad':'warn'}" title="${esc(r.issues.join('\n'))}">Spam check: ${r.level=='risky'?'risky':'okay'}</span>`+r.issues.map(i=>`<span class="tag warn">${esc(i)}</span>`).join('')},400)}
+$('#dBody').addEventListener('input',spamUI);$('#dSubj').addEventListener('input',spamUI);
+$('#dSched').onclick=async()=>{if(!cur)return;const b=$('#dSched');b.disabled=true;b.innerHTML='<span class="spin"></span>';
+ const r=await api().schedule_send(cur.channel_id,$('#dSubj').value,$('#dBody').value,$('#dAttach').checked,$('#dStyle').value);b.disabled=false;b.textContent='Send at their 9am';
+ if(r.error)return toast(r.error,'err');toast(`Scheduled: sends ${r.local} your time (9am for them). Keep the app open then. It's in your Gmail Drafts until it goes.`,'okk');cur.status='drafted';boostLead(cur);renderLeads()};
+$('#dReply').onclick=async()=>{const b=$('#dReply');b.disabled=true;b.innerHTML='<span class="spin"></span>Reading their reply…';const r=await api().reply_draft(cur.channel_id);b.disabled=false;b.textContent='Draft my reply';
+ if(r.error)return toast(r.error,'err');toast(`Reply drafted (${({sure:'they said yes',price:'they asked about price',no:'they said no',question:'they asked something'})[r.kind]}). It's in your Gmail Drafts, opened.`,'okk')};
+$('#dKit').onclick=async()=>{await api().sample_kit(cur.channel_id);toast('Getting the best ~90 seconds of their latest video. The folder opens when it\'s ready.','okk')};
+async function warmPill(){try{const w=await api().warmup();const p=$('#wPill');if($('#goalPill'))$('#goalPill').style.display=w.on?'none':'';if(!w.on){p.style.display='none';return}p.style.display='';
+ p.innerHTML=`<span class="dot ${w.left>0?'ok':'warn'}"></span><span>Warm-up: ${w.sent_today} / ${w.limit} today</span>`;p.title=`Warm-up week ${w.week} (day ${w.day}). ${w.tip}${w.next?` Goes up to ${w.next.limit}/day in ${w.next.in_days} days.`:''}`}catch(e){}}
+setTimeout(warmPill,2500);setInterval(warmPill,60000);
+/* Follow-ups extras: answer replies fast, try a DM when email gets no answer */
+async function renderFuBoost(){const L=await getLeads(),D=await api().dm_backups();const rep=[];let h='';
+ if(rep.length)h+=`<div class="sec-t">Replied: answer fast (it wins clients) · ${rep.length}</div><div class="rows">${rep.map(l=>`<div class="fu"><div style="flex:1" class="nm">${esc(l.title)}</div><button class="btn sm" data-rd="${l.channel_id}">Draft my reply</button><button class="btn sm" data-kit="${l.channel_id}">Sample kit</button></div>`).join('')}</div>`;
+ if(D.length)h+=`<div class="sec-t">No answer by email: try a DM · ${D.length}</div><div class="rows">${D.map(d=>`<div class="fu" style="align-items:flex-start"><div style="flex:1;min-width:0"><div class="nm">${esc(d.title)}</div><div class="small t2" style="margin-top:4px;white-space:pre-wrap">${esc(d.text)}</div></div><div style="display:flex;gap:6px;flex:none;flex-wrap:wrap">${d.links.map(k=>`<button class="btn sm" data-dmo="${esc(k.url)}">${esc(k.where)} ↗</button>`).join('')}<button class="btn sm" data-dmc="${esc(d.text)}">Copy</button><button class="btn sm pri" data-dmd="${d.cid}">Done</button></div></div>`).join('')}</div>`;
+ $('#fuBoost').innerHTML=h;
+ $$('#fuBoost [data-rd]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.innerHTML='<span class="spin"></span>';const r=await api().reply_draft(b.dataset.rd);b.disabled=false;b.textContent='Draft my reply';toast(r.error||'Reply is in your Gmail Drafts',r.error?'err':'okk')});
+ $$('#fuBoost [data-kit]').forEach(b=>b.onclick=async()=>{await api().sample_kit(b.dataset.kit);toast('Getting the sample clip, the folder opens when ready','okk')});
+ $$('#fuBoost [data-dmo]').forEach(b=>b.onclick=()=>api().open(b.dataset.dmo));
+ $$('#fuBoost [data-dmc]').forEach(b=>b.onclick=async()=>{await api().copy(b.dataset.dmc);toast('Copied','okk')});
+ $$('#fuBoost [data-dmd]').forEach(b=>b.onclick=async()=>{await api().dm_backup_done(b.dataset.dmd);renderFuBoost()})}
+/* Pipeline extras: what gets replies, your clients, this week */
+async function renderPipeBoost(){const [I,Cc,T,W]=await Promise.all([api().insights(),api().client_care(),api().testimonial_due(),api().weekly()]);
+ const tb=(t,rows)=>rows.length?`<div class="sec-t">${t}</div><div class="rows">${rows.slice(0,6).map(r=>`<div class="fu"><div style="flex:1" class="nm">${esc(r.k)}</div><span class="small t2">${r.replied} of ${r.sent} replied</span><b style="width:52px;text-align:right">${r.rate}%</b></div>`).join('')}</div>`:'';
+ let h=`<div class="sec-t" style="margin-top:18px">This week</div><div class="card" style="padding:12px 14px">${W.sent} emails sent · ${W.followups} follow-ups · <b>${W.replies} replies (${W.rate}%)</b> · ${W.new_leads} new leads${W.best_niches.length?'<div class="small t2" style="margin-top:4px">Replies came from: '+esc(W.best_niches.join(', '))+'</div>':''}${W.best_searches.length?'<div class="small t2">Best searches: '+esc(W.best_searches.join(', '))+'</div>':''}</div>`;
+ if(I.sent>=5){h+=`<div class="small t2" style="margin:14px 0 -4px">What gets replies (${I.replied} of ${I.sent} replied). Find clients leans toward the winners automatically.</div>`+tb('By niche',I.niche)+tb('By channel size',I.size)+tb('By country',I.country)+tb('Subject lines',I.subject)}
+ else h+='<div class="small t2" style="margin-top:14px">Send a few more emails and this shows which niches, sizes and subject lines get replies.</div>';
+ if(Cc.length)h+=`<div class="sec-t" style="margin-top:18px">Your clients: more work from people who already pay you</div><div class="rows">${Cc.map(c=>`<div class="fu"><div style="flex:1;min-width:0"><div class="nm">${esc(c.title)}</div><div class="small t2">${c.last_upload?'Last upload '+esc(c.last_upload)+' · ':''}Offer: ${esc(c.ideas.join(' · ')||'keep doing great work')}</div></div></div>`).join('')}</div>`;
+ if(T.length)h+=`<div class="sec-t">Ask for a testimonial (2+ weeks working together)</div><div class="rows">${T.map(t=>`<div class="fu"><div style="flex:1" class="nm">${esc(t.title)}</div><span class="small t2">"Would you mind writing one line about working with me?"</span><button class="btn sm" data-ta="${t.cid}">Asked</button></div>`).join('')}</div>`;
+ $('#pBoost').innerHTML=h;$$('#pBoost [data-ta]').forEach(b=>b.onclick=async()=>{await api().testimonial_asked(b.dataset.ta);toast('Add their line in Setup > Samples & testimonials when it comes in','okk');renderPipeBoost()})}
+/* Job posts: hiring radar */
+$('#radarBtn').onclick=async()=>{const b=$('#radarBtn');b.disabled=true;b.innerHTML='<span class="spin"></span>Checking…';const r=await api().radar();b.disabled=false;b.textContent='Check for new posts';
+ const P=r.posts||[];$('#radarOut').innerHTML=P.length?`<div class="rows">${P.map((p,i)=>`<div class="fu" style="align-items:flex-start"><div style="flex:1;min-width:0"><div class="nm">${p.new?'<span class="tag ok">new</span> ':''}${esc(p.title)}</div><div class="small t2">${esc(p.where)} · ${esc(p.when.replace('T',' '))}</div></div><button class="btn sm" data-ru="${i}">Check + reply</button><button class="btn sm ghost" data-ro="${esc(p.url)}">Open ↗</button></div>`).join('')}</div>`:`<div class="small t2">${r.errors&&r.errors.length?'Could not reach Reddit right now: '+esc(r.errors[0]):'No new hiring posts this week. Check again tomorrow.'}</div>`;
+ $$('#radarOut [data-ro]').forEach(x=>x.onclick=()=>api().open(x.dataset.ro));
+ $$('#radarOut [data-ru]').forEach(x=>x.onclick=()=>{const p=P[+x.dataset.ru];$('#job').value=`${p.title}\nPosted ${p.when} on ${p.where} by u/${p.author}\n${p.url}\n\n${p.text}`;$('#tri').click()})};
+
+{const _rf=renderFu;renderFu=async function(){await _rf.apply(this,arguments);try{renderFuBoost()}catch(e){}}}
+{const _rp=renderPipe;renderPipe=async function(){await _rp.apply(this,arguments);try{renderPipeBoost()}catch(e){}}}
+{const _rc=recheck;recheck=function(){_rc.apply(this,arguments);spamUI()}}
+{const _on=SR.on;SR.on=function(k,d){
+ if(k=='emails'){const b=$('#lfindem');if(b){b.disabled=true;b.innerHTML=`<span class="spin"></span>${d.done}/${d.total} · ${d.found} found`}return}
+ if(k=='emails_done'){const b=$('#lfindem');if(b){b.disabled=false;b.textContent='Find more emails'}if(d.error)return toast(d.error,'err');toast(d.found?`Found ${d.found} more email address${d.found>1?'es':''}`:`Checked ${d.checked||0} leads, no new emails this time`,'okk');TODAY=null;loadLeads();return}
+ if(k=='checked_emails'){if(d.bad)toast(`${d.bad} email${d.bad>1?'s':''} can't receive mail (marked in red, skipped in Today)`,'err');return}
+ if(k=='kit'){if(d.error)toast(`Sample kit for ${d.title}: ${d.error}`,'err');else toast(`Sample kit ready for ${d.title}: ${Math.floor(d.start/60)}:${String(d.start%60).padStart(2,'0')} (${d.why}). Folder opened.`,'okk');return}
+ if(k=='weekly'){toast(`Your week: ${d.sent} emails, ${d.replies} replies (${d.rate}%), ${d.new_leads} new leads. More in Pipeline.`,'okk');return}
+ if(k=='scheduled_sent'){toast(`Sent ${d.sent.length} scheduled email${d.sent.length>1?'s':''} (their morning)`,'okk');refresh();warmPill();return}
+ return _on.call(SR,k,d)}}
+</script></body></html>
